@@ -1,25 +1,19 @@
+# Baobab Tree
 
-Installation information
-=======
+Baobab Tree is a NeoForge mod project for Minecraft focused on baobab-themed trees, worldgen, and related natural content.
 
-This template repository can be directly cloned to get you started with a new
-mod. Simply create a new repository cloned from this one, by following the
-instructions provided by [GitHub](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+This repository is set up as a clean project baseline in the same style as `Thin Logs`, `Flora Expansion`, `Matterworks`, and `Cybernetic Enhancements`, so you can start building the actual mod instead of cleaning up the MDK template first.
 
-Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
+Built for:
 
-If at any point you are missing libraries in your IDE, or you've run into problems you can
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-{this does not affect your code} and then start the process again.
+* **Minecraft:** 1.21.1
+* **Mod Loader:** NeoForge
 
-Mapping Names:
-============
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
+Current baseline:
 
-Additional Resources: 
-==========
-Community Documentation: https://docs.neoforged.net/  
-NeoForged Discord: https://discord.neoforged.net/
+* `client` and `common` package split
+* placeholder registry classes for blocks, items, menus, recipes, and creative tabs
+* datagen hook with language provider wiring
+* JEI dependency setup for the dev environment only
+* template-driven `neoforge.mods.toml`
+* MIT license and normalized Gradle project metadata
