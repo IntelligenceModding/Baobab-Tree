@@ -1,7 +1,10 @@
 {
   "values": [
     "baobabtree:baobab_leaves",
-    "baobabtree:baobab_leaf_litter",
-    "baobabtree:baobab_fruit_pod"
+    "baobabtree:baobab_litter",
+    "baobabtree:baobab_fruit_pod",
+    "baobabtree:small_baobab_fruit_pod",
+    "baobabtree:medium_baobab_fruit_pod",
+    "baobabtree:large_baobab_fruit_pod"
   ]
 }

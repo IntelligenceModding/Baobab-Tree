@@ -20,13 +20,12 @@ public class ModItemModelProvider extends ItemModelProvider {
         vanillaTextureItem(ModItems.BAOBAB_HANGING_SIGN.get(), "acacia_hanging_sign");
         vanillaTextureItem(ModItems.BAOBAB_BOAT.get(), "acacia_boat");
         vanillaTextureItem(ModItems.BAOBAB_CHEST_BOAT.get(), "acacia_chest_boat");
-        vanillaTextureItem(ModItems.BAOBAB_FRUIT.get(), "melon_slice");
+        vanillaTextureItem(ModItems.BAOBAB_FRUIT_PIECE.get(), "melon_slice");
         vanillaTextureItem(ModItems.DRIED_BAOBAB_PULP.get(), "dried_kelp");
         vanillaTextureItem(ModItems.BAOBAB_SEEDS.get(), "pumpkin_seeds");
         vanillaTextureBlockItem(ModBlocks.BAOBAB_SAPLING.get().asItem(), "acacia_sapling");
 
-        modTextureItem(ModBlocks.BAOBAB_LEAF_LITTER.get().asItem(), "leaf_litter");
-        vanillaTextureBlockItem(ModBlocks.BAOBAB_FRUIT_POD.get().asItem(), "hanging_roots");
+        modTextureItem(ModBlocks.BAOBAB_LITTER.get().asItem(), "baobab_litter");
     }
 
     private void vanillaTextureItem(Item item, String textureName) {

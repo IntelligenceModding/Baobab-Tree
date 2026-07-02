@@ -2,6 +2,7 @@ package de.artemis.baobabtree.common.datagen;
 
 import de.artemis.baobabtree.BaobabTree;
 import de.artemis.baobabtree.common.block.BaobabFruitPodBlock;
+import de.artemis.baobabtree.common.block.BaobabHangingPodBlock;
 import de.artemis.baobabtree.common.registry.ModBlocks;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
@@ -66,9 +67,9 @@ public class ModBlockStateProvider extends BlockStateProvider {
         saplingBlock(ModBlocks.BAOBAB_SAPLING.get(), mcLoc("block/acacia_sapling"));
         pottedPlantBlock(ModBlocks.POTTED_BAOBAB_SAPLING.get(), mcLoc("block/acacia_sapling"));
 
-        leafLitterBlock();
+        litterBlock();
 
-        logBlock(ModBlocks.TREE_ROOT.get(), mcLoc("block/muddy_mangrove_roots_side"), mcLoc("block/muddy_mangrove_roots_top"));
+        logBlock(ModBlocks.TREE_ROOT.get(), modLoc("block/tree_roots_side"), modLoc("block/tree_roots_top"));
         fruitPodBlock();
     }
 
@@ -179,13 +180,13 @@ public class ModBlockStateProvider extends BlockStateProvider {
         simpleBlockItem(block, vertical);
     }
 
-    private void leafLitterBlock() {
-        String name = BuiltInRegistries.BLOCK.getKey(ModBlocks.BAOBAB_LEAF_LITTER.get()).getPath();
+    private void litterBlock() {
+        String name = BuiltInRegistries.BLOCK.getKey(ModBlocks.BAOBAB_LITTER.get()).getPath();
         ModelFile one = models().getExistingFile(modLoc("block/" + name + "_1"));
         ModelFile two = models().getExistingFile(modLoc("block/" + name + "_2"));
         ModelFile three = models().getExistingFile(modLoc("block/" + name + "_3"));
         ModelFile four = models().getExistingFile(modLoc("block/" + name + "_4"));
-        MultiPartBlockStateBuilder builder = getMultipartBuilder(ModBlocks.BAOBAB_LEAF_LITTER.get());
+        MultiPartBlockStateBuilder builder = getMultipartBuilder(ModBlocks.BAOBAB_LITTER.get());
 
         addLeafLitterPart(builder, one, Direction.NORTH, 0, 1);
         addLeafLitterPart(builder, one, Direction.EAST, 90, 1);
@@ -222,19 +223,95 @@ public class ModBlockStateProvider extends BlockStateProvider {
     }
 
     private void fruitPodBlock() {
-        BlockModelBuilder[] stages = new BlockModelBuilder[]{
-                models().cross("baobab_fruit_pod_stage0", mcLoc("block/acacia_sapling")).renderType("cutout"),
-                models().cross("baobab_fruit_pod_stage1", mcLoc("block/acacia_sapling")).renderType("cutout"),
-                models().cross("baobab_fruit_pod_stage2", mcLoc("block/hanging_roots")).renderType("cutout"),
-                models().cross("baobab_fruit_pod_stage3", mcLoc("block/hanging_roots")).renderType("cutout"),
-                models().cross("baobab_fruit_pod_stage4", mcLoc("block/hanging_roots")).renderType("cutout")
+        ModelFile base = models()
+                .cross("baobab_fruit_pod_base", modLoc("block/baobab_fruit_pod_stage0"))
+                .texture("particle", modLoc("block/baobab_fruit_pod_stage0"))
+                .renderType("cutout");
+        ModelFile[] podStages = new ModelFile[]{
+                podModel("baobab_fruit_pod_growth_stage1", 6.0F, 8.0F, 6.0F, 10.0F, 14.0F, 10.0F, "1", 4.0F, 6.0F, 4.0F),
+                podModel("baobab_fruit_pod_growth_stage2", 4.0F, 4.0F, 4.0F, 12.0F, 14.0F, 12.0F, "2", 8.0F, 10.0F, 8.0F),
+                podModel("baobab_fruit_pod_growth_stage3", 2.0F, 2.0F, 2.0F, 14.0F, 14.0F, 14.0F, "3", 12.0F, 12.0F, 12.0F)
         };
 
-        getVariantBuilder(ModBlocks.BAOBAB_FRUIT_POD.get()).forAllStates(state -> {
-            int age = state.getValue(BaobabFruitPodBlock.AGE);
-            return ConfiguredModel.builder().modelFile(stages[age]).build();
-        });
+        directionalPodBlock(
+                ModBlocks.SMALL_BAOBAB_FRUIT_POD.get(),
+                podModel("small_baobab_fruit_pod", 6.0F, 0.0F, 6.0F, 10.0F, 6.0F, 10.0F, "1", 4.0F, 6.0F, 4.0F)
+        );
+        directionalPodBlock(
+                ModBlocks.MEDIUM_BAOBAB_FRUIT_POD.get(),
+                podModel("medium_baobab_fruit_pod", 4.0F, 0.0F, 4.0F, 12.0F, 10.0F, 12.0F, "2", 8.0F, 10.0F, 8.0F)
+        );
+        directionalPodBlock(
+                ModBlocks.LARGE_BAOBAB_FRUIT_POD.get(),
+                podModel("large_baobab_fruit_pod", 2.0F, 0.0F, 2.0F, 14.0F, 12.0F, 14.0F, "3", 12.0F, 12.0F, 12.0F)
+        );
 
-        simpleBlockItem(ModBlocks.BAOBAB_FRUIT_POD.get(), stages[4]);
+        MultiPartBlockStateBuilder builder = getMultipartBuilder(ModBlocks.BAOBAB_FRUIT_POD.get());
+        for (Direction facing : Direction.Plane.HORIZONTAL) {
+            int rotationY = ((int) facing.toYRot() + 180) % 360;
+
+            for (int age = 0; age <= 3; age++) {
+                builder.part()
+                        .modelFile(base)
+                        .rotationY(rotationY)
+                        .uvLock(true)
+                        .addModel()
+                        .condition(BaobabFruitPodBlock.FACING, facing)
+                        .condition(BaobabFruitPodBlock.AGE, age);
+            }
+
+            for (int age = 1; age <= 3; age++) {
+                builder.part()
+                        .modelFile(podStages[age - 1])
+                        .rotationY(rotationY)
+                        .uvLock(true)
+                        .addModel()
+                        .condition(BaobabFruitPodBlock.FACING, facing)
+                        .condition(BaobabFruitPodBlock.AGE, age);
+            }
+        }
+
+        simpleBlockItem(ModBlocks.BAOBAB_FRUIT_POD.get(), models().getExistingFile(modLoc("large_baobab_fruit_pod")));
+    }
+
+    private ModelFile podModel(String name,
+                               float fromX,
+                               float fromY,
+                               float fromZ,
+                               float toX,
+                               float toY,
+                               float toZ,
+                               String stage,
+                               float uvWidth,
+                               float uvHeight,
+                               float uvDepth) {
+        return models().withExistingParent(name, mcLoc("block/block"))
+                .renderType("cutout")
+                .texture("particle", modLoc("block/baobab_fruit_pod_side_stage" + stage))
+                .texture("side", modLoc("block/baobab_fruit_pod_side_stage" + stage))
+                .texture("end", modLoc("block/baobab_fruit_pod_top_stage" + stage))
+                .element()
+                .from(fromX, fromY, fromZ)
+                .to(toX, toY, toZ)
+                .face(Direction.NORTH).texture("#side").uvs(0.0F, 0.0F, uvWidth, uvHeight).end()
+                .face(Direction.SOUTH).texture("#side").uvs(0.0F, 0.0F, uvWidth, uvHeight).end()
+                .face(Direction.WEST).texture("#side").uvs(0.0F, 0.0F, uvDepth, uvHeight).end()
+                .face(Direction.EAST).texture("#side").uvs(0.0F, 0.0F, uvDepth, uvHeight).end()
+                .face(Direction.UP).texture("#end").uvs(0.0F, 0.0F, 16.0F, 16.0F).cullface(Direction.UP).end()
+                .face(Direction.DOWN).texture("#end").uvs(16.0F, 16.0F, 0.0F, 0.0F).cullface(Direction.DOWN).end()
+                .end();
+    }
+
+    private void directionalPodBlock(Block block, ModelFile model) {
+        getVariantBuilder(block).forAllStates(state -> {
+            Direction facing = state.getValue(BaobabHangingPodBlock.FACING);
+            int rotationY = ((int) facing.toYRot() + 180) % 360;
+            return ConfiguredModel.builder()
+                    .modelFile(model)
+                    .rotationY(rotationY)
+                    .uvLock(true)
+                    .build();
+        });
+        simpleBlockItem(block, model);
     }
 }

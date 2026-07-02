@@ -22,9 +22,12 @@ public class ModDataMapProvider extends DataMapProvider {
         builder(NeoForgeDataMaps.COMPOSTABLES)
                 .add(ModBlocks.BAOBAB_LEAVES.getId(), new Compostable(0.3F), false)
                 .add(ModBlocks.BAOBAB_SAPLING.getId(), new Compostable(0.3F), false)
-                .add(ModBlocks.BAOBAB_LEAF_LITTER.getId(), new Compostable(0.3F), false)
+                .add(ModBlocks.BAOBAB_LITTER.getId(), new Compostable(0.3F), false)
                 .add(ModBlocks.BAOBAB_FRUIT_POD.getId(), new Compostable(0.5F), false)
-                .add(ModItems.BAOBAB_FRUIT.getId(), new Compostable(0.65F), false)
+                .add(ModBlocks.SMALL_BAOBAB_FRUIT_POD.getId(), new Compostable(0.5F), false)
+                .add(ModBlocks.MEDIUM_BAOBAB_FRUIT_POD.getId(), new Compostable(0.5F), false)
+                .add(ModBlocks.LARGE_BAOBAB_FRUIT_POD.getId(), new Compostable(0.5F), false)
+                .add(ModItems.BAOBAB_FRUIT_PIECE.getId(), new Compostable(0.65F), false)
                 .add(ModItems.DRIED_BAOBAB_PULP.getId(), new Compostable(0.85F), false)
                 .add(ModItems.BAOBAB_SEEDS.getId(), new Compostable(0.3F), false);
 
@@ -46,7 +49,7 @@ public class ModDataMapProvider extends DataMapProvider {
                 .add(ModBlocks.BAOBAB_TRAPDOOR.getId(), new FurnaceFuel(300), false)
                 .add(ModBlocks.BAOBAB_BUTTON.getId(), new FurnaceFuel(100), false)
                 .add(ModBlocks.BAOBAB_PRESSURE_PLATE.getId(), new FurnaceFuel(300), false)
-                .add(ModBlocks.BAOBAB_LEAF_LITTER.getId(), new FurnaceFuel(100), false)
+                .add(ModBlocks.BAOBAB_LITTER.getId(), new FurnaceFuel(100), false)
                 .add(ModBlocks.TREE_ROOT.getId(), new FurnaceFuel(300), false);
     }
 }

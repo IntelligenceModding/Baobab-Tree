@@ -1,6 +1,7 @@
 package de.artemis.baobabtree.common.registry;
 
 import de.artemis.baobabtree.BaobabTree;
+import de.artemis.baobabtree.common.block.entity.BaobabLitterBlockEntity;
 import de.artemis.baobabtree.common.block.entity.BaobabHangingSignBlockEntity;
 import de.artemis.baobabtree.common.block.entity.BaobabSignBlockEntity;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -27,6 +28,13 @@ public final class ModBlockEntities {
                             BaobabHangingSignBlockEntity::new,
                             ModBlocks.BAOBAB_HANGING_SIGN.get(),
                             ModBlocks.BAOBAB_WALL_HANGING_SIGN.get()
+                    ).build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BaobabLitterBlockEntity>> BAOBAB_LITTER =
+            BLOCK_ENTITIES.register("baobab_litter",
+                    () -> BlockEntityType.Builder.of(
+                            BaobabLitterBlockEntity::new,
+                            ModBlocks.BAOBAB_LITTER.get()
                     ).build(null));
 
     private ModBlockEntities() {

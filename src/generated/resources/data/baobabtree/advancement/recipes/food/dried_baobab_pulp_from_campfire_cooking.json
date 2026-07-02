@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_baobab_fruit": {
+    "has_baobab_fruit_piece": {
       "conditions": {
         "items": [
           {
-            "items": "baobabtree:baobab_fruit"
+            "items": "baobabtree:baobab_fruit_piece"
           }
         ]
       },
@@ -21,7 +21,7 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_baobab_fruit"
+      "has_baobab_fruit_piece"
     ]
   ],
   "rewards": {

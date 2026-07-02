@@ -11,6 +11,7 @@ public class BaobabTreeClient {
         modEventBus.addListener(ClientModEvents::onClientSetup);
         modEventBus.addListener(ClientModEvents::registerEntityRenderers);
         modEventBus.addListener(ClientModEvents::registerBlockEntityRenderers);
+        modEventBus.addListener(ClientModEvents::registerParticleProviders);
         modEventBus.addListener(ClientModEvents::registerBlockColors);
         modEventBus.addListener(ClientModEvents::registerItemColors);
     }

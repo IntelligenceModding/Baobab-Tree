@@ -2,6 +2,7 @@ package de.artemis.baobabtree.common.registry;
 
 import de.artemis.baobabtree.BaobabTree;
 import de.artemis.baobabtree.common.item.BaobabBoatItem;
+import de.artemis.baobabtree.common.item.BaobabSeedsItem;
 import net.minecraft.world.item.HangingSignItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.SignItem;
@@ -24,14 +25,14 @@ public final class ModItems {
     public static final DeferredItem<Item> BAOBAB_CHEST_BOAT = ITEMS.register("baobab_chest_boat",
             () -> new BaobabBoatItem(true, new Item.Properties().stacksTo(1)));
 
-    public static final DeferredItem<Item> BAOBAB_FRUIT = ITEMS.register("baobab_fruit",
-            () -> new Item(new Item.Properties().food(ModFoods.BAOBAB_FRUIT)));
+    public static final DeferredItem<Item> BAOBAB_FRUIT_PIECE = ITEMS.register("baobab_fruit_piece",
+            () -> new Item(new Item.Properties().food(ModFoods.BAOBAB_FRUIT_PIECE)));
 
     public static final DeferredItem<Item> DRIED_BAOBAB_PULP = ITEMS.register("dried_baobab_pulp",
             () -> new Item(new Item.Properties().food(ModFoods.DRIED_BAOBAB_PULP)));
 
     public static final DeferredItem<Item> BAOBAB_SEEDS = ITEMS.register("baobab_seeds",
-            () -> new Item(new Item.Properties()));
+            () -> new BaobabSeedsItem(new Item.Properties()));
 
     private ModItems() {
     }

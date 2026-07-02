@@ -11,14 +11,11 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
-import net.minecraft.world.level.storage.loot.functions.ApplyExplosionDecay;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
-import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.List;
 import java.util.Set;
 
 public class ModBlockLootTableProvider extends BlockLootSubProvider {
@@ -50,49 +47,40 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
         add(ModBlocks.BAOBAB_LEAVES.get(), createLeavesDrops(ModBlocks.BAOBAB_LEAVES.get(), ModBlocks.BAOBAB_SAPLING.get(), NORMAL_LEAVES_SAPLING_CHANCES));
         dropSelf(ModBlocks.BAOBAB_SAPLING.get());
         dropPottedContents(ModBlocks.POTTED_BAOBAB_SAPLING.get());
-        dropSelf(ModBlocks.BAOBAB_LEAF_LITTER.get());
+        dropSelf(ModBlocks.BAOBAB_LITTER.get());
         dropSelf(ModBlocks.TREE_ROOT.get());
-        add(ModBlocks.BAOBAB_FRUIT_POD.get(), createFruitPodDrops());
+        add(ModBlocks.BAOBAB_FRUIT_POD.get(), createFruitPodPlantDrops());
+        dropSelf(ModBlocks.SMALL_BAOBAB_FRUIT_POD.get());
+        dropSelf(ModBlocks.MEDIUM_BAOBAB_FRUIT_POD.get());
+        dropSelf(ModBlocks.LARGE_BAOBAB_FRUIT_POD.get());
     }
 
-    private LootTable.Builder createFruitPodDrops() {
+    private LootTable.Builder createFruitPodPlantDrops() {
         return LootTable.lootTable()
                 .withPool(LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1.0F))
                         .when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(ModBlocks.BAOBAB_FRUIT_POD.get())
-                                .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(BaobabFruitPodBlock.AGE, 4)))
-                        .add(applyExplosionCondition(ModBlocks.BAOBAB_FRUIT_POD.get(),
-                                LootItem.lootTableItem(ModItems.BAOBAB_FRUIT.get())
-                                        .apply(SetItemCountFunction.setCount(UniformGenerator.between(1.0F, 2.0F)))
-                                        .apply(ApplyExplosionDecay.explosionDecay()))))
-                .withPool(LootPool.lootPool()
-                        .setRolls(ConstantValue.exactly(1.0F))
-                        .when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(ModBlocks.BAOBAB_FRUIT_POD.get())
-                                .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(BaobabFruitPodBlock.AGE, 4)))
-                        .add(applyExplosionCondition(ModBlocks.BAOBAB_FRUIT_POD.get(),
-                                LootItem.lootTableItem(ModItems.BAOBAB_SEEDS.get())
-                                        .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1.0F)))
-                                        .apply(ApplyExplosionDecay.explosionDecay()))))
-                .withPool(LootPool.lootPool()
-                        .setRolls(ConstantValue.exactly(1.0F))
-                        .when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(ModBlocks.BAOBAB_FRUIT_POD.get())
                                 .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(BaobabFruitPodBlock.AGE, 0)))
-                        .add(applyExplosionCondition(ModBlocks.BAOBAB_FRUIT_POD.get(), LootItem.lootTableItem(ModBlocks.BAOBAB_FRUIT_POD.get()))))
+                        .add(applyExplosionCondition(ModBlocks.BAOBAB_FRUIT_POD.get(), LootItem.lootTableItem(ModItems.BAOBAB_SEEDS.get()))))
                 .withPool(LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1.0F))
                         .when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(ModBlocks.BAOBAB_FRUIT_POD.get())
                                 .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(BaobabFruitPodBlock.AGE, 1)))
-                        .add(applyExplosionCondition(ModBlocks.BAOBAB_FRUIT_POD.get(), LootItem.lootTableItem(ModBlocks.BAOBAB_FRUIT_POD.get()))))
+                        .add(applyExplosionCondition(ModBlocks.BAOBAB_FRUIT_POD.get(), LootItem.lootTableItem(ModItems.BAOBAB_FRUIT_PIECE.get()))))
                 .withPool(LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1.0F))
                         .when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(ModBlocks.BAOBAB_FRUIT_POD.get())
                                 .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(BaobabFruitPodBlock.AGE, 2)))
-                        .add(applyExplosionCondition(ModBlocks.BAOBAB_FRUIT_POD.get(), LootItem.lootTableItem(ModBlocks.BAOBAB_FRUIT_POD.get()))))
+                        .add(applyExplosionCondition(ModBlocks.BAOBAB_FRUIT_POD.get(),
+                                LootItem.lootTableItem(ModItems.BAOBAB_FRUIT_PIECE.get())
+                                        .apply(SetItemCountFunction.setCount(ConstantValue.exactly(2.0F))))))
                 .withPool(LootPool.lootPool()
                         .setRolls(ConstantValue.exactly(1.0F))
                         .when(LootItemBlockStatePropertyCondition.hasBlockStateProperties(ModBlocks.BAOBAB_FRUIT_POD.get())
                                 .setProperties(StatePropertiesPredicate.Builder.properties().hasProperty(BaobabFruitPodBlock.AGE, 3)))
-                        .add(applyExplosionCondition(ModBlocks.BAOBAB_FRUIT_POD.get(), LootItem.lootTableItem(ModBlocks.BAOBAB_FRUIT_POD.get()))));
+                        .add(applyExplosionCondition(ModBlocks.BAOBAB_FRUIT_POD.get(),
+                                LootItem.lootTableItem(ModItems.BAOBAB_FRUIT_PIECE.get())
+                                        .apply(SetItemCountFunction.setCount(ConstantValue.exactly(3.0F))))));
     }
 
     @Override

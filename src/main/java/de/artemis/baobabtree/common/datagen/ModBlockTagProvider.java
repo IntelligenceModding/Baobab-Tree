@@ -42,8 +42,11 @@ public class ModBlockTagProvider extends BlockTagsProvider {
 
         tag(BlockTags.MINEABLE_WITH_HOE)
                 .add(ModBlocks.BAOBAB_LEAVES.get())
-                .add(ModBlocks.BAOBAB_LEAF_LITTER.get())
-                .add(ModBlocks.BAOBAB_FRUIT_POD.get());
+                .add(ModBlocks.BAOBAB_LITTER.get())
+                .add(ModBlocks.BAOBAB_FRUIT_POD.get())
+                .add(ModBlocks.SMALL_BAOBAB_FRUIT_POD.get())
+                .add(ModBlocks.MEDIUM_BAOBAB_FRUIT_POD.get())
+                .add(ModBlocks.LARGE_BAOBAB_FRUIT_POD.get());
 
         tag(BlockTags.SAPLINGS)
                 .add(ModBlocks.BAOBAB_SAPLING.get());

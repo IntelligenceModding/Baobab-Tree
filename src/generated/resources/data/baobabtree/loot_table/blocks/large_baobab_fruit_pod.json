@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "baobabtree:baobab_leaf_litter"
+          "name": "baobabtree:large_baobab_fruit_pod"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "baobabtree:blocks/baobab_leaf_litter"
+  "random_sequence": "baobabtree:blocks/large_baobab_fruit_pod"
 }

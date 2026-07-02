@@ -3,10 +3,14 @@ package de.artemis.baobabtree.common.registry;
 import de.artemis.baobabtree.BaobabTree;
 import de.artemis.baobabtree.common.block.BaobabCeilingHangingSignBlock;
 import de.artemis.baobabtree.common.block.BaobabFruitPodBlock;
+import de.artemis.baobabtree.common.block.BaobabHangingPodBlock;
+import de.artemis.baobabtree.common.block.BaobabLitterBlock;
+import de.artemis.baobabtree.common.block.BaobabSaplingBlock;
 import de.artemis.baobabtree.common.block.BaobabStandingSignBlock;
 import de.artemis.baobabtree.common.block.BaobabStrippableLogBlock;
 import de.artemis.baobabtree.common.block.BaobabWallHangingSignBlock;
 import de.artemis.baobabtree.common.block.BaobabWallSignBlock;
+import de.artemis.baobabtree.common.block.TreeRootBlock;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -19,9 +23,9 @@ import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.PinkPetalsBlock;
 import net.minecraft.world.level.block.PressurePlateBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
-import net.minecraft.world.level.block.SaplingBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -90,19 +94,28 @@ public final class ModBlocks {
             () -> new LeavesBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_LEAVES).randomTicks()));
 
     public static final DeferredBlock<Block> BAOBAB_SAPLING = registerBlock("baobab_sapling",
-            () -> new SaplingBlock(ModTreeGrowers.BAOBAB, BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_SAPLING)));
+            () -> new BaobabSaplingBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_SAPLING)));
 
     public static final DeferredBlock<Block> POTTED_BAOBAB_SAPLING = BLOCKS.register("potted_baobab_sapling",
             () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, BAOBAB_SAPLING, BlockBehaviour.Properties.ofFullCopy(Blocks.POTTED_ACACIA_SAPLING).noOcclusion()));
 
-    public static final DeferredBlock<Block> BAOBAB_LEAF_LITTER = registerBlock("baobab_leaf_litter",
-            () -> new PinkPetalsBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.PINK_PETALS)));
+    public static final DeferredBlock<Block> BAOBAB_LITTER = registerBlock("baobab_litter",
+            () -> new BaobabLitterBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.PINK_PETALS)));
 
     public static final DeferredBlock<Block> TREE_ROOT = registerBlock("tree_root",
-            () -> new RotatedPillarBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.MUDDY_MANGROVE_ROOTS)));
+            () -> new TreeRootBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.MUDDY_MANGROVE_ROOTS).sound(SoundType.ROOTED_DIRT)));
 
     public static final DeferredBlock<Block> BAOBAB_FRUIT_POD = registerBlock("baobab_fruit_pod",
-            () -> new BaobabFruitPodBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.COCOA).randomTicks()));
+            () -> new BaobabFruitPodBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.COCOA).randomTicks().sound(SoundType.CROP)));
+
+    public static final DeferredBlock<Block> SMALL_BAOBAB_FRUIT_POD = registerBlock("small_baobab_fruit_pod",
+            () -> new BaobabHangingPodBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.COCOA).sound(SoundType.CROP), 0));
+
+    public static final DeferredBlock<Block> MEDIUM_BAOBAB_FRUIT_POD = registerBlock("medium_baobab_fruit_pod",
+            () -> new BaobabHangingPodBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.COCOA).sound(SoundType.CROP), 1));
+
+    public static final DeferredBlock<Block> LARGE_BAOBAB_FRUIT_POD = registerBlock("large_baobab_fruit_pod",
+            () -> new BaobabHangingPodBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.COCOA).sound(SoundType.CROP), 2));
 
     private ModBlocks() {
     }

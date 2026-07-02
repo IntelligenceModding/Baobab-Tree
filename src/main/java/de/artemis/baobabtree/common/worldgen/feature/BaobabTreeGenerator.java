@@ -9,6 +9,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.PinkPetalsBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -87,6 +88,14 @@ public final class BaobabTreeGenerator {
     }
 
     public static boolean generate(WorldGenLevel level, BlockPos origin, RandomSource random, Variant variant) {
+        return generate(level, origin, random, variant, true);
+    }
+
+    public static boolean generateSapling(WorldGenLevel level, BlockPos origin, RandomSource random) {
+        return generate(level, origin, random, Variant.YOUNG, false);
+    }
+
+    private static boolean generate(WorldGenLevel level, BlockPos origin, RandomSource random, Variant variant, boolean withGroundDecoration) {
         if (origin.getY() <= level.getMinBuildHeight() + 1) {
             return false;
         }
@@ -96,13 +105,21 @@ public final class BaobabTreeGenerator {
             return false;
         }
 
-        GenerationState state = new GenerationState(level, random, origin, variant, trunkHeight);
-        state.placeGroundPatch();
-        state.placeRootSystem();
+        GenerationState state = new GenerationState(level, random, origin, variant, trunkHeight, withGroundDecoration);
+        if (withGroundDecoration) {
+            state.placeGroundPatch();
+            state.placeRootSystem();
+        }
         state.placeTrunk();
         state.placeBranches();
         state.placeLeafClusters();
         state.finalizeLeaves();
+        if (withGroundDecoration) {
+            state.placeFruitPods();
+        }
+        if (withGroundDecoration) {
+            state.placeGroundCover();
+        }
         return true;
     }
 
@@ -167,7 +184,7 @@ public final class BaobabTreeGenerator {
                 || state.canBeReplaced()
                 || state.is(BlockTags.LEAVES)
                 || state.is(Blocks.VINE)
-                || state.is(ModBlocks.BAOBAB_LEAF_LITTER.get());
+                || state.is(ModBlocks.BAOBAB_LITTER.get());
     }
 
     private static final class GenerationState {
@@ -182,16 +199,19 @@ public final class BaobabTreeGenerator {
         private final float baseRadius;
         private final float bodyRadius;
         private final float neckRadius;
+        @SuppressWarnings("unused")
+        private final boolean withGroundDecoration;
         private final Set<BlockPos> logPositions = new HashSet<>();
         private final Set<BlockPos> leafPositions = new HashSet<>();
         private final List<LeafPadSeed> leafPadSeeds = new ArrayList<>();
 
-        private GenerationState(WorldGenLevel level, RandomSource random, BlockPos origin, Variant variant, int trunkHeight) {
+        private GenerationState(WorldGenLevel level, RandomSource random, BlockPos origin, Variant variant, int trunkHeight, boolean withGroundDecoration) {
             this.level = level;
             this.random = random;
             this.origin = origin;
             this.variant = variant;
             this.trunkHeight = trunkHeight;
+            this.withGroundDecoration = withGroundDecoration;
             this.branchCount = Mth.nextInt(random, variant.minBranches, variant.maxBranches);
             this.desiredLeafClusters = Mth.nextInt(random, variant.minLeafClusters, variant.maxLeafClusters);
             this.leafRadius = Mth.nextInt(random, variant.minLeafRadius, variant.maxLeafRadius);
@@ -345,6 +365,115 @@ public final class BaobabTreeGenerator {
                     || state.is(Blocks.ROOTED_DIRT)
                     || state.is(Blocks.RED_SAND)
                     || state.is(Blocks.SAND);
+        }
+
+        private void placeGroundCover() {
+            int radius = switch (variant) {
+                case YOUNG -> 4;
+                case MATURE -> 6;
+                case ANCIENT -> 7;
+            };
+
+            for (int dx = -radius; dx <= radius; dx++) {
+                for (int dz = -radius; dz <= radius; dz++) {
+                    double distance = Math.sqrt(dx * dx + dz * dz);
+                    if (distance > radius + 0.35D) {
+                        continue;
+                    }
+                    if (distance < Math.max(1.6D, baseRadius - 0.6D) && random.nextFloat() < 0.65F) {
+                        continue;
+                    }
+
+                    int x = origin.getX() + dx;
+                    int z = origin.getZ() + dz;
+                    int surfaceY = level.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, x, z) - 1;
+                    if (Math.abs(surfaceY - (origin.getY() - 1)) > 2) {
+                        continue;
+                    }
+
+                    BlockPos supportPos = new BlockPos(x, surfaceY, z);
+                    BlockPos placePos = supportPos.above();
+                    BlockState supportState = level.getBlockState(supportPos);
+                    BlockState placeState = level.getBlockState(placePos);
+
+                    if (!canPlaceGroundCoverOn(supportState) || !canPlaceDecorationAt(placeState)) {
+                        continue;
+                    }
+                    if (supportState.is(ModBlocks.TREE_ROOT.get()) && random.nextFloat() < 0.75F) {
+                        continue;
+                    }
+
+                    float normalized = (float) (distance / Math.max(1.0D, radius));
+                    float litterChance = 0.74F - normalized * 0.24F;
+                    if (random.nextFloat() < litterChance) {
+                        placeLitter(placePos, supportPos);
+                        continue;
+                    }
+
+                    float foliageChance = 0.22F + normalized * 0.24F;
+                    if (random.nextFloat() < foliageChance) {
+                        placeFoliage(placePos, supportPos);
+                    }
+                }
+            }
+        }
+
+        private boolean canPlaceGroundCoverOn(BlockState state) {
+            return state.is(BlockTags.DIRT)
+                    || state.is(Blocks.GRASS_BLOCK)
+                    || state.is(Blocks.COARSE_DIRT)
+                    || state.is(Blocks.DIRT)
+                    || state.is(Blocks.ROOTED_DIRT)
+                    || state.is(Blocks.SAND)
+                    || state.is(Blocks.RED_SAND)
+                    || state.is(ModBlocks.TREE_ROOT.get());
+        }
+
+        private boolean canPlaceDecorationAt(BlockState state) {
+            return state.isAir() || state.canBeReplaced();
+        }
+
+        private void placeLitter(BlockPos placePos, BlockPos supportPos) {
+            if (!level.getBlockState(supportPos).isFaceSturdy(level, supportPos, Direction.UP)) {
+                return;
+            }
+
+            int amountRoll = random.nextInt(10);
+            int amount = switch (amountRoll) {
+                case 0, 1, 2, 3 -> 1;
+                case 4, 5, 6 -> 2;
+                case 7, 8 -> 3;
+                default -> 4;
+            };
+            Direction facing = Direction.Plane.HORIZONTAL.getRandomDirection(random);
+            BlockState litterState = ModBlocks.BAOBAB_LITTER.get().defaultBlockState()
+                    .setValue(PinkPetalsBlock.AMOUNT, amount)
+                    .setValue(PinkPetalsBlock.FACING, facing)
+                    .setValue(de.artemis.baobabtree.common.block.BaobabLitterBlock.HAS_FRUIT, random.nextFloat() < amount * 0.07F);
+            if (litterState.canSurvive(level, placePos)) {
+                level.setBlock(placePos, litterState, 2);
+            }
+        }
+
+        private void placeFoliage(BlockPos placePos, BlockPos supportPos) {
+            if (!level.getBlockState(supportPos).isFaceSturdy(level, supportPos, Direction.UP)) {
+                return;
+            }
+
+            BlockState supportState = level.getBlockState(supportPos);
+            BlockState foliageState;
+            if (supportState.is(Blocks.SAND) || supportState.is(Blocks.RED_SAND)) {
+                foliageState = Blocks.DEAD_BUSH.defaultBlockState();
+            } else {
+                int roll = random.nextInt(10);
+                foliageState = roll < 6 ? Blocks.SHORT_GRASS.defaultBlockState()
+                        : roll < 8 ? Blocks.FERN.defaultBlockState()
+                        : Blocks.DEAD_BUSH.defaultBlockState();
+            }
+
+            if (foliageState.canSurvive(level, placePos)) {
+                level.setBlock(placePos, foliageState, 2);
+            }
         }
 
         private void placeTrunk() {
@@ -642,6 +771,62 @@ public final class BaobabTreeGenerator {
                     int distance = distances.getOrDefault(leafPos, 7);
                     level.setBlock(leafPos, state.setValue(LeavesBlock.DISTANCE, Math.min(7, distance)).setValue(LeavesBlock.PERSISTENT, false), 2);
                 }
+            }
+        }
+
+        private void placeFruitPods() {
+            List<BlockPos> candidates = new ArrayList<>();
+            for (BlockPos leafPos : leafPositions) {
+                BlockPos podPos = leafPos.below();
+                BlockState belowState = level.getBlockState(podPos);
+                if (!belowState.isAir() && !belowState.canBeReplaced()) {
+                    continue;
+                }
+                if (leafPos.getY() < origin.getY() + trunkHeight - 5) {
+                    continue;
+                }
+                if (Math.abs(leafPos.getX() - origin.getX()) <= 1 && Math.abs(leafPos.getZ() - origin.getZ()) <= 1) {
+                    continue;
+                }
+                candidates.add(leafPos.immutable());
+            }
+
+            if (candidates.isEmpty()) {
+                return;
+            }
+
+            shuffleCandidates(candidates);
+            int targetCount = switch (variant) {
+                case YOUNG -> 3 + random.nextInt(4);
+                case MATURE -> 6 + random.nextInt(7);
+                case ANCIENT -> 9 + random.nextInt(7);
+            };
+
+            int placed = 0;
+            for (BlockPos leafPos : candidates) {
+                if (placed >= targetCount) {
+                    break;
+                }
+
+                BlockPos podPos = leafPos.below();
+                BlockState state = ModBlocks.BAOBAB_FRUIT_POD.get().defaultBlockState()
+                        .setValue(de.artemis.baobabtree.common.block.BaobabFruitPodBlock.AGE, random.nextInt(4))
+                        .setValue(de.artemis.baobabtree.common.block.BaobabFruitPodBlock.FACING, Direction.Plane.HORIZONTAL.getRandomDirection(random));
+                if (!state.canSurvive(level, podPos)) {
+                    continue;
+                }
+
+                level.setBlock(podPos, state, 2);
+                placed++;
+            }
+        }
+
+        private void shuffleCandidates(List<BlockPos> positions) {
+            for (int i = positions.size() - 1; i > 0; i--) {
+                int swapIndex = random.nextInt(i + 1);
+                BlockPos tmp = positions.get(i);
+                positions.set(i, positions.get(swapIndex));
+                positions.set(swapIndex, tmp);
             }
         }
 

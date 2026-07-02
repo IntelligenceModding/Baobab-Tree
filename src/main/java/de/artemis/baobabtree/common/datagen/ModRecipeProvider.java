@@ -29,7 +29,7 @@ public class ModRecipeProvider extends RecipeProvider {
 
     @Override
     protected void buildRecipes(@NotNull RecipeOutput recipeOutput) {
-        planksFromLogs(recipeOutput, ModBlocks.BAOBAB_PLANKS.get(), ModTags.Items.BAOBAB_LOGS, 4);
+        planksFromLogs(recipeOutput, ModBlocks.BAOBAB_PLANKS.get(), ModTags.Items.BAOBAB_LOGS, 2);
         woodFromLogs(recipeOutput, ModBlocks.BAOBAB_WOOD.get(), ModBlocks.BAOBAB_LOG.get());
         woodFromLogs(recipeOutput, ModBlocks.STRIPPED_BAOBAB_WOOD.get(), ModBlocks.STRIPPED_BAOBAB_LOG.get());
 
@@ -76,14 +76,40 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(ModItems.BAOBAB_SEEDS.get()), has(ModItems.BAOBAB_SEEDS.get()))
                 .save(recipeOutput, ResourceLocation.fromNamespaceAndPath(BaobabTree.MOD_ID, "baobab_sapling_from_seeds"));
 
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.DECORATIONS, ModBlocks.BAOBAB_LEAF_LITTER.get(), 2)
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.DECORATIONS, ModBlocks.BAOBAB_LITTER.get(), 2)
                 .requires(ModBlocks.BAOBAB_LEAVES.get())
                 .unlockedBy(getHasName(ModBlocks.BAOBAB_LEAVES.get()), has(ModBlocks.BAOBAB_LEAVES.get()))
                 .save(recipeOutput);
 
-        foodSmelting(recipeOutput, ModItems.BAOBAB_FRUIT.get(), ModItems.DRIED_BAOBAB_PULP.get(), 0.1F, 200);
-        foodSmoking(recipeOutput, ModItems.BAOBAB_FRUIT.get(), ModItems.DRIED_BAOBAB_PULP.get(), 0.1F, 100);
-        foodCampfireCooking(recipeOutput, ModItems.BAOBAB_FRUIT.get(), ModItems.DRIED_BAOBAB_PULP.get(), 0.1F, 600);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.DECORATIONS, ModBlocks.TREE_ROOT.get())
+                .requires(Blocks.DIRT)
+                .requires(Blocks.HANGING_ROOTS)
+                .unlockedBy(getHasName(Blocks.HANGING_ROOTS), has(Blocks.HANGING_ROOTS))
+                .save(recipeOutput);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.DECORATIONS, Blocks.HANGING_ROOTS)
+                .requires(ModBlocks.TREE_ROOT.get())
+                .unlockedBy(getHasName(ModBlocks.TREE_ROOT.get()), has(ModBlocks.TREE_ROOT.get()))
+                .save(recipeOutput, ResourceLocation.fromNamespaceAndPath(BaobabTree.MOD_ID, "hanging_roots_from_tree_root"));
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, ModItems.BAOBAB_FRUIT_PIECE.get(), 1)
+                .requires(ModBlocks.SMALL_BAOBAB_FRUIT_POD.get())
+                .unlockedBy(getHasName(ModBlocks.SMALL_BAOBAB_FRUIT_POD.get()), has(ModBlocks.SMALL_BAOBAB_FRUIT_POD.get()))
+                .save(recipeOutput, ResourceLocation.fromNamespaceAndPath(BaobabTree.MOD_ID, "baobab_fruit_piece_from_small_pod"));
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, ModItems.BAOBAB_FRUIT_PIECE.get(), 2)
+                .requires(ModBlocks.MEDIUM_BAOBAB_FRUIT_POD.get())
+                .unlockedBy(getHasName(ModBlocks.MEDIUM_BAOBAB_FRUIT_POD.get()), has(ModBlocks.MEDIUM_BAOBAB_FRUIT_POD.get()))
+                .save(recipeOutput, ResourceLocation.fromNamespaceAndPath(BaobabTree.MOD_ID, "baobab_fruit_piece_from_medium_pod"));
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, ModItems.BAOBAB_FRUIT_PIECE.get(), 3)
+                .requires(ModBlocks.LARGE_BAOBAB_FRUIT_POD.get())
+                .unlockedBy(getHasName(ModBlocks.LARGE_BAOBAB_FRUIT_POD.get()), has(ModBlocks.LARGE_BAOBAB_FRUIT_POD.get()))
+                .save(recipeOutput, ResourceLocation.fromNamespaceAndPath(BaobabTree.MOD_ID, "baobab_fruit_piece_from_large_pod"));
+
+        foodSmelting(recipeOutput, ModItems.BAOBAB_FRUIT_PIECE.get(), ModItems.DRIED_BAOBAB_PULP.get(), 0.1F, 200);
+        foodSmoking(recipeOutput, ModItems.BAOBAB_FRUIT_PIECE.get(), ModItems.DRIED_BAOBAB_PULP.get(), 0.1F, 100);
+        foodCampfireCooking(recipeOutput, ModItems.BAOBAB_FRUIT_PIECE.get(), ModItems.DRIED_BAOBAB_PULP.get(), 0.1F, 600);
     }
 
     private static void foodSmelting(RecipeOutput recipeOutput, ItemLike input, ItemLike output, float exp, int time) {

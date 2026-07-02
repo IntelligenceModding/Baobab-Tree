@@ -1,19 +1,305 @@
 {
-  "variants": {
-    "age=0": {
-      "model": "baobabtree:block/baobab_fruit_pod_stage0"
+  "multipart": [
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_base",
+        "uvlock": true
+      },
+      "when": {
+        "age": "0",
+        "facing": "north"
+      }
     },
-    "age=1": {
-      "model": "baobabtree:block/baobab_fruit_pod_stage1"
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_base",
+        "uvlock": true
+      },
+      "when": {
+        "age": "1",
+        "facing": "north"
+      }
     },
-    "age=2": {
-      "model": "baobabtree:block/baobab_fruit_pod_stage2"
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_base",
+        "uvlock": true
+      },
+      "when": {
+        "age": "2",
+        "facing": "north"
+      }
     },
-    "age=3": {
-      "model": "baobabtree:block/baobab_fruit_pod_stage3"
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_base",
+        "uvlock": true
+      },
+      "when": {
+        "age": "3",
+        "facing": "north"
+      }
     },
-    "age=4": {
-      "model": "baobabtree:block/baobab_fruit_pod_stage4"
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_growth_stage1",
+        "uvlock": true
+      },
+      "when": {
+        "age": "1",
+        "facing": "north"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_growth_stage2",
+        "uvlock": true
+      },
+      "when": {
+        "age": "2",
+        "facing": "north"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_growth_stage3",
+        "uvlock": true
+      },
+      "when": {
+        "age": "3",
+        "facing": "north"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_base",
+        "uvlock": true,
+        "y": 90
+      },
+      "when": {
+        "age": "0",
+        "facing": "east"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_base",
+        "uvlock": true,
+        "y": 90
+      },
+      "when": {
+        "age": "1",
+        "facing": "east"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_base",
+        "uvlock": true,
+        "y": 90
+      },
+      "when": {
+        "age": "2",
+        "facing": "east"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_base",
+        "uvlock": true,
+        "y": 90
+      },
+      "when": {
+        "age": "3",
+        "facing": "east"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_growth_stage1",
+        "uvlock": true,
+        "y": 90
+      },
+      "when": {
+        "age": "1",
+        "facing": "east"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_growth_stage2",
+        "uvlock": true,
+        "y": 90
+      },
+      "when": {
+        "age": "2",
+        "facing": "east"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_growth_stage3",
+        "uvlock": true,
+        "y": 90
+      },
+      "when": {
+        "age": "3",
+        "facing": "east"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_base",
+        "uvlock": true,
+        "y": 180
+      },
+      "when": {
+        "age": "0",
+        "facing": "south"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_base",
+        "uvlock": true,
+        "y": 180
+      },
+      "when": {
+        "age": "1",
+        "facing": "south"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_base",
+        "uvlock": true,
+        "y": 180
+      },
+      "when": {
+        "age": "2",
+        "facing": "south"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_base",
+        "uvlock": true,
+        "y": 180
+      },
+      "when": {
+        "age": "3",
+        "facing": "south"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_growth_stage1",
+        "uvlock": true,
+        "y": 180
+      },
+      "when": {
+        "age": "1",
+        "facing": "south"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_growth_stage2",
+        "uvlock": true,
+        "y": 180
+      },
+      "when": {
+        "age": "2",
+        "facing": "south"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_growth_stage3",
+        "uvlock": true,
+        "y": 180
+      },
+      "when": {
+        "age": "3",
+        "facing": "south"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_base",
+        "uvlock": true,
+        "y": 270
+      },
+      "when": {
+        "age": "0",
+        "facing": "west"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_base",
+        "uvlock": true,
+        "y": 270
+      },
+      "when": {
+        "age": "1",
+        "facing": "west"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_base",
+        "uvlock": true,
+        "y": 270
+      },
+      "when": {
+        "age": "2",
+        "facing": "west"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_base",
+        "uvlock": true,
+        "y": 270
+      },
+      "when": {
+        "age": "3",
+        "facing": "west"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_growth_stage1",
+        "uvlock": true,
+        "y": 270
+      },
+      "when": {
+        "age": "1",
+        "facing": "west"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_growth_stage2",
+        "uvlock": true,
+        "y": 270
+      },
+      "when": {
+        "age": "2",
+        "facing": "west"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_fruit_pod_growth_stage3",
+        "uvlock": true,
+        "y": 270
+      },
+      "when": {
+        "age": "3",
+        "facing": "west"
+      }
     }
-  }
+  ]
 }

@@ -3,11 +3,11 @@
   "category": "misc",
   "ingredients": [
     {
-      "item": "baobabtree:baobab_leaves"
+      "item": "baobabtree:large_baobab_fruit_pod"
     }
   ],
   "result": {
-    "count": 2,
-    "id": "baobabtree:baobab_leaf_litter"
+    "count": 3,
+    "id": "baobabtree:baobab_fruit_piece"
   }
 }

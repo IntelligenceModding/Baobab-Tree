@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "baobabtree:small_baobab_fruit_pod"
+    }
+  ],
+  "result": {
+    "count": 1,
+    "id": "baobabtree:baobab_fruit_piece"
+  }
+}

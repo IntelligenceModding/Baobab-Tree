@@ -8,78 +8,6 @@
           "block": "baobabtree:baobab_fruit_pod",
           "condition": "minecraft:block_state_property",
           "properties": {
-            "age": "4"
-          }
-        }
-      ],
-      "entries": [
-        {
-          "type": "minecraft:item",
-          "conditions": [
-            {
-              "condition": "minecraft:survives_explosion"
-            }
-          ],
-          "functions": [
-            {
-              "add": false,
-              "count": {
-                "type": "minecraft:uniform",
-                "max": 2.0,
-                "min": 1.0
-              },
-              "function": "minecraft:set_count"
-            },
-            {
-              "function": "minecraft:explosion_decay"
-            }
-          ],
-          "name": "baobabtree:baobab_fruit"
-        }
-      ],
-      "rolls": 1.0
-    },
-    {
-      "bonus_rolls": 0.0,
-      "conditions": [
-        {
-          "block": "baobabtree:baobab_fruit_pod",
-          "condition": "minecraft:block_state_property",
-          "properties": {
-            "age": "4"
-          }
-        }
-      ],
-      "entries": [
-        {
-          "type": "minecraft:item",
-          "conditions": [
-            {
-              "condition": "minecraft:survives_explosion"
-            }
-          ],
-          "functions": [
-            {
-              "add": false,
-              "count": 1.0,
-              "function": "minecraft:set_count"
-            },
-            {
-              "function": "minecraft:explosion_decay"
-            }
-          ],
-          "name": "baobabtree:baobab_seeds"
-        }
-      ],
-      "rolls": 1.0
-    },
-    {
-      "bonus_rolls": 0.0,
-      "conditions": [
-        {
-          "block": "baobabtree:baobab_fruit_pod",
-          "condition": "minecraft:block_state_property",
-          "properties": {
             "age": "0"
           }
         }
@@ -92,7 +20,7 @@
               "condition": "minecraft:survives_explosion"
             }
           ],
-          "name": "baobabtree:baobab_fruit_pod"
+          "name": "baobabtree:baobab_seeds"
         }
       ],
       "rolls": 1.0
@@ -116,7 +44,7 @@
               "condition": "minecraft:survives_explosion"
             }
           ],
-          "name": "baobabtree:baobab_fruit_pod"
+          "name": "baobabtree:baobab_fruit_piece"
         }
       ],
       "rolls": 1.0
@@ -140,7 +68,14 @@
               "condition": "minecraft:survives_explosion"
             }
           ],
-          "name": "baobabtree:baobab_fruit_pod"
+          "functions": [
+            {
+              "add": false,
+              "count": 2.0,
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "baobabtree:baobab_fruit_piece"
         }
       ],
       "rolls": 1.0
@@ -164,7 +99,14 @@
               "condition": "minecraft:survives_explosion"
             }
           ],
-          "name": "baobabtree:baobab_fruit_pod"
+          "functions": [
+            {
+              "add": false,
+              "count": 3.0,
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "baobabtree:baobab_fruit_piece"
         }
       ],
       "rolls": 1.0
