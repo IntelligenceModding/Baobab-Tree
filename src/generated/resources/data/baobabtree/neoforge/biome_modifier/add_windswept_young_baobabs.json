@@ -1,6 +1,0 @@
-{
-  "type": "neoforge:add_features",
-  "biomes": "minecraft:windswept_savanna",
-  "features": "baobabtree:windswept_young_baobab_placed",
-  "step": "vegetal_decoration"
-}
