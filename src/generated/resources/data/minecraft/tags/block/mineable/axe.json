@@ -1,0 +1,22 @@
+{
+  "values": [
+    "baobabtree:baobab_log",
+    "baobabtree:baobab_wood",
+    "baobabtree:stripped_baobab_log",
+    "baobabtree:stripped_baobab_wood",
+    "baobabtree:baobab_planks",
+    "baobabtree:baobab_stairs",
+    "baobabtree:baobab_slab",
+    "baobabtree:baobab_fence",
+    "baobabtree:baobab_fence_gate",
+    "baobabtree:baobab_button",
+    "baobabtree:baobab_pressure_plate",
+    "baobabtree:baobab_door",
+    "baobabtree:baobab_trapdoor",
+    "baobabtree:baobab_sign",
+    "baobabtree:baobab_wall_sign",
+    "baobabtree:baobab_hanging_sign",
+    "baobabtree:baobab_wall_hanging_sign",
+    "baobabtree:tree_root"
+  ]
+}

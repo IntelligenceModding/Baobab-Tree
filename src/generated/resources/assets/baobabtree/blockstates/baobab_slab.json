@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "baobabtree:block/baobab_slab"
+    },
+    "type=double": {
+      "model": "minecraft:block/acacia_planks"
+    },
+    "type=top": {
+      "model": "baobabtree:block/baobab_slab_top"
+    }
+  }
+}

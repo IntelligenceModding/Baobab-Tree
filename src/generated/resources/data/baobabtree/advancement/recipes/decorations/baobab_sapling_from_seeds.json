@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_baobab_seeds": {
+      "conditions": {
+        "items": [
+          {
+            "items": "baobabtree:baobab_seeds"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "baobabtree:baobab_sapling_from_seeds"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_baobab_seeds"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "baobabtree:baobab_sapling_from_seeds"
+    ]
+  }
+}

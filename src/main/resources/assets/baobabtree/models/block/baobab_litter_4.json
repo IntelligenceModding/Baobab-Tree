@@ -1,0 +1,6 @@
+{
+  "parent": "baobabtree:block/template/template_bushy_litter_4",
+  "textures": {
+    "texture": "baobabtree:block/baobab_litter"
+  }
+}

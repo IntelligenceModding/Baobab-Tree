@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#baobabtree:has_baobab_generation",
+  "features": "baobabtree:young_baobab_placed",
+  "step": "vegetal_decoration"
+}
