@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_baobab_seeds": {
+    "has_small_baobab_fruit_pod": {
       "conditions": {
         "items": [
           {
-            "items": "baobabtree:baobab_seeds"
+            "items": "baobabtree:small_baobab_fruit_pod"
           }
         ]
       },
@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "baobabtree:baobab_sapling_from_seeds"
+        "recipe": "baobabtree:baobab_fruit_from_small_pod"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -21,12 +21,12 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_baobab_seeds"
+      "has_small_baobab_fruit_pod"
     ]
   ],
   "rewards": {
     "recipes": [
-      "baobabtree:baobab_sapling_from_seeds"
+      "baobabtree:baobab_fruit_from_small_pod"
     ]
   }
 }

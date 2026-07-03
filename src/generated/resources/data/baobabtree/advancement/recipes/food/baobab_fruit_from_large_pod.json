@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "baobabtree:baobab_fruit_piece_from_large_pod"
+        "recipe": "baobabtree:baobab_fruit_from_large_pod"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -26,7 +26,7 @@
   ],
   "rewards": {
     "recipes": [
-      "baobabtree:baobab_fruit_piece_from_large_pod"
+      "baobabtree:baobab_fruit_from_large_pod"
     ]
   }
 }

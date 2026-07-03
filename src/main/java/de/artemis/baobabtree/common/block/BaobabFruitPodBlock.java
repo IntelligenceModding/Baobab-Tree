@@ -19,6 +19,9 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BonemealableBlock;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Fallable;
+import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -36,12 +39,14 @@ public class BaobabFruitPodBlock extends Block implements BonemealableBlock {
     public static final MapCodec<BaobabFruitPodBlock> CODEC = simpleCodec(BaobabFruitPodBlock::new);
     public static final IntegerProperty AGE = BlockStateProperties.AGE_3;
     public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    private static final int RIPE_FALL_MIN_DELAY_TICKS = 30 * 20;
+    private static final int RIPE_FALL_MAX_DELAY_TICKS = 180 * 20;
 
     private static final VoxelShape[] SHAPES = new VoxelShape[]{
             Block.box(7.0D, 10.0D, 7.0D, 9.0D, 15.0D, 9.0D),
-            Block.box(6.0D, 8.0D, 6.0D, 10.0D, 14.0D, 10.0D),
-            Block.box(4.0D, 4.0D, 4.0D, 12.0D, 14.0D, 12.0D),
-            Block.box(2.0D, 2.0D, 2.0D, 14.0D, 14.0D, 14.0D)
+            Block.box(6.0D, 7.0D, 6.0D, 10.0D, 13.0D, 10.0D),
+            Block.box(4.0D, 3.0D, 4.0D, 12.0D, 13.0D, 12.0D),
+            Block.box(2.0D, 1.0D, 2.0D, 14.0D, 13.0D, 14.0D)
     };
 
     public BaobabFruitPodBlock(BlockBehaviour.Properties properties) {
@@ -78,9 +83,14 @@ public class BaobabFruitPodBlock extends Block implements BonemealableBlock {
                                               @NotNull LevelAccessor level,
                                               @NotNull BlockPos pos,
                                               @NotNull BlockPos neighborPos) {
-        return direction == Direction.UP && !state.canSurvive(level, pos)
-                ? net.minecraft.world.level.block.Blocks.AIR.defaultBlockState()
-                : super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+        if (direction == Direction.UP && !state.canSurvive(level, pos)) {
+            if (level instanceof ServerLevel serverLevel) {
+                dropFromBrokenSupport(serverLevel, pos, state);
+            }
+            return Blocks.AIR.defaultBlockState();
+        }
+
+        return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
     }
 
     @Override
@@ -97,8 +107,47 @@ public class BaobabFruitPodBlock extends Block implements BonemealableBlock {
                               @NotNull RandomSource random) {
         int age = state.getValue(AGE);
         if (age < 3 && random.nextInt(5) == 0) {
-            level.setBlock(pos, state.setValue(AGE, age + 1), Block.UPDATE_CLIENTS);
+            int newAge = age + 1;
+            BlockState grownState = state.setValue(AGE, newAge);
+            level.setBlock(pos, grownState, Block.UPDATE_CLIENTS);
+            if (newAge == 3) {
+                scheduleRipeFallCheck(level, pos);
+            }
         }
+    }
+
+    @Override
+    protected void onPlace(@NotNull BlockState state,
+                           @NotNull Level level,
+                           @NotNull BlockPos pos,
+                           @NotNull BlockState oldState,
+                           boolean movedByPiston) {
+        super.onPlace(state, level, pos, oldState, movedByPiston);
+        if (!level.isClientSide() && state.getValue(AGE) == 3) {
+            scheduleRipeFallCheck((ServerLevel) level, pos);
+        }
+    }
+
+    @Override
+    protected void tick(@NotNull BlockState state,
+                        @NotNull ServerLevel level,
+                        @NotNull BlockPos pos,
+                        @NotNull RandomSource random) {
+        if (state.getValue(AGE) != 3 || !state.canSurvive(level, pos)) {
+            return;
+        }
+
+        if (hasPodBelow(level, pos) || !hasValidPodLandingBelow(level, pos, state.getValue(FACING))) {
+            scheduleRipeFallCheck(level, pos);
+            return;
+        }
+
+        BlockState fallingPodState = ModBlocks.LARGE_BAOBAB_FRUIT_POD.get().defaultBlockState()
+                .setValue(BaobabHangingPodBlock.FACING, state.getValue(FACING));
+        playPodDetachFeedback(level, pos, fallingPodState);
+        FallingBlockEntity fallingBlock = FallingBlockEntity.fall(level, pos, fallingPodState);
+        BaobabHangingPodBlock.configureFallingDamage(fallingBlock, fallingPodState);
+        level.setBlock(pos, state.setValue(AGE, 0), Block.UPDATE_CLIENTS);
     }
 
     @Override
@@ -164,8 +213,74 @@ public class BaobabFruitPodBlock extends Block implements BonemealableBlock {
                                 @NotNull BlockState state) {
         int age = state.getValue(AGE);
         if (age < 3) {
-            level.setBlock(pos, state.setValue(AGE, age + 1), Block.UPDATE_CLIENTS);
+            int newAge = age + 1;
+            BlockState grownState = state.setValue(AGE, newAge);
+            level.setBlock(pos, grownState, Block.UPDATE_CLIENTS);
+            if (newAge == 3) {
+                scheduleRipeFallCheck(level, pos);
+            }
         }
+    }
+
+    private void scheduleRipeFallCheck(ServerLevel level, BlockPos pos) {
+        int delay = RIPE_FALL_MIN_DELAY_TICKS + level.random.nextInt(RIPE_FALL_MAX_DELAY_TICKS - RIPE_FALL_MIN_DELAY_TICKS + 1);
+        level.scheduleTick(pos, this, delay);
+    }
+
+    private void dropFromBrokenSupport(ServerLevel level, BlockPos pos, BlockState state) {
+        int age = state.getValue(AGE);
+        if (age <= 0) {
+            Block.popResource(level, pos, new ItemStack(ModItems.BAOBAB_FRUIT.get()));
+            level.setBlock(pos, Blocks.AIR.defaultBlockState(), Block.UPDATE_CLIENTS);
+            return;
+        }
+
+        BlockState fallingPodState = podItemForAge(age).defaultBlockState()
+                .setValue(BaobabHangingPodBlock.FACING, state.getValue(FACING));
+        playPodDetachFeedback(level, pos, fallingPodState);
+        FallingBlockEntity fallingBlock = FallingBlockEntity.fall(level, pos, fallingPodState);
+        BaobabHangingPodBlock.configureFallingDamage(fallingBlock, fallingPodState);
+    }
+
+    private void playPodDetachFeedback(ServerLevel level, BlockPos pos, BlockState fallingPodState) {
+        level.levelEvent(2001, pos, Block.getId(fallingPodState));
+        level.playSound(null, pos, fallingPodState.getSoundType().getBreakSound(), SoundSource.BLOCKS, 0.9F, 0.85F + level.random.nextFloat() * 0.1F);
+    }
+
+    private boolean hasPodBelow(LevelReader level, BlockPos pos) {
+        for (BlockPos checkPos = pos.below(); checkPos.getY() >= level.getMinBuildHeight(); checkPos = checkPos.below()) {
+            BlockState checkState = level.getBlockState(checkPos);
+            if (checkState.is(ModBlocks.SMALL_BAOBAB_FRUIT_POD.get())
+                    || checkState.is(ModBlocks.MEDIUM_BAOBAB_FRUIT_POD.get())
+                    || checkState.is(ModBlocks.LARGE_BAOBAB_FRUIT_POD.get())) {
+                return true;
+            }
+
+            if (!checkState.isAir() && !checkState.canBeReplaced()) {
+                return false;
+            }
+        }
+        return false;
+    }
+
+    private boolean hasValidPodLandingBelow(LevelReader level, BlockPos pos, Direction facing) {
+        for (BlockPos checkPos = pos.below(); checkPos.getY() >= level.getMinBuildHeight(); checkPos = checkPos.below()) {
+            BlockState checkState = level.getBlockState(checkPos);
+            if (checkState.isAir() || checkState.canBeReplaced()) {
+                continue;
+            }
+
+            BlockPos landingPos = checkPos.above();
+            if (!level.getBlockState(landingPos).canBeReplaced()) {
+                return false;
+            }
+
+            BlockState landingState = ModBlocks.LARGE_BAOBAB_FRUIT_POD.get().defaultBlockState()
+                    .setValue(BaobabHangingPodBlock.FACING, facing);
+            return landingState.canSurvive(level, landingPos);
+        }
+
+        return false;
     }
 
     private void giveToPlayerOrDrop(Level level, BlockPos pos, Player player, ItemStack stack) {

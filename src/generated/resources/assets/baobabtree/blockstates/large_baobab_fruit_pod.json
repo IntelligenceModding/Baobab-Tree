@@ -2,21 +2,17 @@
   "variants": {
     "facing=east": {
       "model": "baobabtree:block/large_baobab_fruit_pod",
-      "uvlock": true,
       "y": 90
     },
     "facing=north": {
-      "model": "baobabtree:block/large_baobab_fruit_pod",
-      "uvlock": true
+      "model": "baobabtree:block/large_baobab_fruit_pod"
     },
     "facing=south": {
       "model": "baobabtree:block/large_baobab_fruit_pod",
-      "uvlock": true,
       "y": 180
     },
     "facing=west": {
       "model": "baobabtree:block/large_baobab_fruit_pod",
-      "uvlock": true,
       "y": 270
     }
   }

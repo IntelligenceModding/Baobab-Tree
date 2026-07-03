@@ -8,10 +8,12 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.DoublePlantBlock;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.PinkPetalsBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.levelgen.Heightmap;
 
 import java.util.ArrayDeque;
@@ -27,7 +29,8 @@ public final class BaobabTreeGenerator {
     public enum Variant {
         YOUNG(11, 12, 2.2F, 1.9F, 1.35F, 5, 6, 5, 6, 1.0F, 6, 8, 3, 4, 0, 6, 2),
         MATURE(17, 18, 3.4F, 2.9F, 2.0F, 6, 7, 6, 7, 1.0F, 10, 12, 4, 5, 0, 10, 3),
-        ANCIENT(22, 24, 4.3F, 3.6F, 2.5F, 6, 7, 8, 9, 1.05F, 12, 15, 4, 5, 0, 13, 4);
+        ANCIENT(22, 24, 4.3F, 3.6F, 2.5F, 6, 7, 8, 9, 1.05F, 12, 15, 4, 5, 0, 13, 4),
+        FALLEN(8, 10, 3.2F, 2.7F, 1.9F, 3, 4, 4, 5, 1.0F, 5, 7, 3, 4, 0, 12, 3);
 
         final int minHeight;
         final int maxHeight;
@@ -100,6 +103,10 @@ public final class BaobabTreeGenerator {
             return false;
         }
 
+        if (variant == Variant.FALLEN) {
+            return generateFallen(level, origin, random, withGroundDecoration);
+        }
+
         int trunkHeight = Mth.nextInt(random, variant.minHeight, variant.maxHeight);
         if (!isValidGround(level, origin, variant) || !hasClearance(level, origin, trunkHeight, variant)) {
             return false;
@@ -111,6 +118,8 @@ public final class BaobabTreeGenerator {
             state.placeRootSystem();
         }
         state.placeTrunk();
+        state.anchorTrunkBase();
+        state.carveAncientHollow();
         state.placeBranches();
         state.placeLeafClusters();
         state.finalizeLeaves();
@@ -127,6 +136,11 @@ public final class BaobabTreeGenerator {
         int sampleRadius = Mth.ceil(variant.baseRadius) + 2;
         int minSurface = Integer.MAX_VALUE;
         int maxSurface = Integer.MIN_VALUE;
+        int centerSurfaceY = level.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, origin.getX(), origin.getZ()) - 1;
+
+        if (centerSurfaceY != origin.getY() - 1) {
+            return false;
+        }
 
         for (int dx = -sampleRadius; dx <= sampleRadius; dx++) {
             for (int dz = -sampleRadius; dz <= sampleRadius; dz++) {
@@ -156,7 +170,7 @@ public final class BaobabTreeGenerator {
                     continue;
                 }
 
-                for (int y = 1; y <= trunkHeight + variant.maxLeafRadius + 6; y++) {
+                for (int y = 0; y <= trunkHeight + variant.maxLeafRadius + 6; y++) {
                     BlockPos pos = origin.offset(dx, y, dz);
                     BlockState state = level.getBlockState(pos);
                     if (!canReplace(state) && !state.is(BlockTags.LOGS) && !state.is(BlockTags.LEAVES)) {
@@ -167,6 +181,122 @@ public final class BaobabTreeGenerator {
         }
 
         return origin.getY() + trunkHeight + variant.maxLeafRadius + 6 < level.getMaxBuildHeight();
+    }
+
+    private static boolean generateFallen(WorldGenLevel level, BlockPos origin, RandomSource random, boolean withGroundDecoration) {
+        if (!isValidGround(level, origin, Variant.FALLEN)) {
+            return false;
+        }
+
+        Direction direction = Direction.Plane.HORIZONTAL.getRandomDirection(random);
+        int stumpHeight = Mth.nextInt(random, 5, 7);
+        int trunkLength = Mth.nextInt(random, 10, 13);
+        float stumpBaseRadius = 3.0F + (random.nextFloat() - 0.5F) * 0.2F;
+        float stumpTopRadius = 2.15F + (random.nextFloat() - 0.5F) * 0.15F;
+        float trunkBaseRadius = 2.55F + (random.nextFloat() - 0.5F) * 0.15F;
+        float trunkTipRadius = 1.55F + (random.nextFloat() - 0.5F) * 0.1F;
+
+        if (!hasFallenClearance(level, origin, direction, trunkLength, stumpHeight, stumpBaseRadius, trunkBaseRadius)) {
+            return false;
+        }
+
+        Set<BlockPos> logPositions = new HashSet<>();
+        Set<BlockPos> leafPositions = new HashSet<>();
+        List<LeafPadSeed> leafPadSeeds = new ArrayList<>();
+        List<BlockPos> trunkCenters = new ArrayList<>();
+
+        if (withGroundDecoration) {
+            placeFallenGroundBlend(level, random, origin, direction, trunkLength, stumpBaseRadius, trunkBaseRadius);
+        }
+
+        for (int y = 0; y < stumpHeight; y++) {
+            float t = y / (float) Math.max(1, stumpHeight - 1);
+            float radius = Mth.lerp(t, stumpBaseRadius, stumpTopRadius);
+            placeVerticalCircularLayer(level, origin, origin.getY() + y, radius, logPositions);
+        }
+
+        for (int y = 1; y < stumpHeight; y++) {
+            float t = y / (float) Math.max(1, stumpHeight - 1);
+            float outerRadius = Mth.lerp(t, stumpBaseRadius, stumpTopRadius);
+            float hollowRadius = Math.max(0.95F, outerRadius - 1.15F);
+            carveVerticalCircularLayer(level, origin, origin.getY() + y, hollowRadius, logPositions);
+        }
+
+        for (int step = 0; step < trunkLength; step++) {
+            float t = step / (float) Math.max(1, trunkLength - 1);
+            float radius = Mth.lerp(t, trunkBaseRadius, trunkTipRadius) + Mth.sin(t * Mth.PI) * 0.12F;
+            int x = origin.getX() + direction.getStepX() * (step + 1);
+            int z = origin.getZ() + direction.getStepZ() * (step + 1);
+            int surfaceY = level.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, x, z) - 1;
+            int centerY = surfaceY + Mth.floor(radius);
+            if (step == 0) {
+                centerY = Math.max(centerY, origin.getY() + 2);
+            } else if (step == 1) {
+                centerY = Math.max(centerY, origin.getY() + 1);
+            }
+
+            BlockPos center = new BlockPos(x, centerY, z);
+            trunkCenters.add(center);
+            placeHorizontalCircularLayer(level, center, direction.getAxis(), radius, logPositions);
+            carveHorizontalCircularLayer(level, center, direction.getAxis(), Math.max(0.95F, radius - 1.1F), logPositions);
+        }
+
+        anchorFallenWood(level, logPositions, 4);
+        placeFallenCanopy(level, random, direction, trunkCenters, leafPadSeeds, logPositions, leafPositions);
+        finalizeGeneratedLeaves(level, logPositions, leafPositions);
+
+        if (withGroundDecoration) {
+            placeFallenFruitPods(level, random, origin, leafPositions);
+            placeFallenGroundCover(level, random, origin, direction, trunkCenters, stumpBaseRadius);
+        }
+
+        return true;
+    }
+
+    private static boolean hasFallenClearance(WorldGenLevel level,
+                                              BlockPos origin,
+                                              Direction direction,
+                                              int trunkLength,
+                                              int stumpHeight,
+                                              float stumpRadius,
+                                              float trunkRadius) {
+        int stumpExtent = Mth.ceil(stumpRadius) + 3;
+        for (int dx = -stumpExtent; dx <= stumpExtent; dx++) {
+            for (int dz = -stumpExtent; dz <= stumpExtent; dz++) {
+                for (int y = 0; y <= stumpHeight + 5; y++) {
+                    BlockPos pos = origin.offset(dx, y, dz);
+                    BlockState state = level.getBlockState(pos);
+                    if (!canReplace(state) && !state.is(BlockTags.LOGS) && !state.is(BlockTags.LEAVES)) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        int lateralExtent = Mth.ceil(trunkRadius) + 3;
+        for (int step = 0; step < trunkLength; step++) {
+            int x = origin.getX() + direction.getStepX() * (step + 1);
+            int z = origin.getZ() + direction.getStepZ() * (step + 1);
+            int surfaceY = level.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, x, z) - 1;
+            if (Math.abs(surfaceY - (origin.getY() - 1)) > Variant.FALLEN.maxSlope) {
+                return false;
+            }
+
+            int centerY = surfaceY + Mth.floor(trunkRadius);
+            for (int lateral = -lateralExtent; lateral <= lateralExtent; lateral++) {
+                for (int dy = -1; dy <= lateralExtent + 5; dy++) {
+                    BlockPos pos = direction.getAxis() == Direction.Axis.X
+                            ? new BlockPos(x, centerY + dy, z + lateral)
+                            : new BlockPos(x + lateral, centerY + dy, z);
+                    BlockState state = level.getBlockState(pos);
+                    if (!canReplace(state) && !state.is(BlockTags.LOGS) && !state.is(BlockTags.LEAVES)) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return origin.getY() + stumpHeight + 8 < level.getMaxBuildHeight();
     }
 
     private static boolean isAllowedSoil(BlockState state) {
@@ -185,6 +315,493 @@ public final class BaobabTreeGenerator {
                 || state.is(BlockTags.LEAVES)
                 || state.is(Blocks.VINE)
                 || state.is(ModBlocks.BAOBAB_LITTER.get());
+    }
+
+    private static void placeFallenGroundBlend(WorldGenLevel level,
+                                               RandomSource random,
+                                               BlockPos origin,
+                                               Direction direction,
+                                               int trunkLength,
+                                               float stumpRadius,
+                                               float trunkRadius) {
+        int stumpExtent = Mth.ceil(stumpRadius) + 2;
+        for (int dx = -stumpExtent; dx <= stumpExtent; dx++) {
+            for (int dz = -stumpExtent; dz <= stumpExtent; dz++) {
+                double distance = Math.sqrt(dx * dx + dz * dz);
+                if (distance > stumpRadius + 1.2D) {
+                    continue;
+                }
+
+                BlockPos soilPos = surfacePosAt(level, origin.getX() + dx, origin.getZ() + dz);
+                BlockState state = level.getBlockState(soilPos);
+                if (state.is(BlockTags.DIRT) || state.is(Blocks.GRASS_BLOCK)) {
+                    setGeneratedBlock(level, soilPos, random.nextFloat() < 0.6F ? Blocks.COARSE_DIRT.defaultBlockState() : Blocks.DIRT.defaultBlockState());
+                }
+                if (distance > stumpRadius - 0.4D && random.nextFloat() < 0.45F) {
+                    Direction.Axis axis = Math.abs(dx) >= Math.abs(dz) ? Direction.Axis.X : Direction.Axis.Z;
+                    tryPlaceSoilBlock(level, soilPos, ModBlocks.TREE_ROOT.get().defaultBlockState().setValue(RotatedPillarBlock.AXIS, axis));
+                } else if (random.nextFloat() < 0.35F) {
+                    tryPlaceSoilBlock(level, soilPos.below(), Blocks.ROOTED_DIRT.defaultBlockState());
+                }
+            }
+        }
+
+        int width = Mth.ceil(trunkRadius) + 1;
+        for (int step = 0; step < trunkLength; step++) {
+            int x = origin.getX() + direction.getStepX() * (step + 1);
+            int z = origin.getZ() + direction.getStepZ() * (step + 1);
+            for (int lateral = -width; lateral <= width; lateral++) {
+                int sampleX = direction.getAxis() == Direction.Axis.X ? x : x + lateral;
+                int sampleZ = direction.getAxis() == Direction.Axis.X ? z + lateral : z;
+                BlockPos soilPos = surfacePosAt(level, sampleX, sampleZ);
+                BlockState state = level.getBlockState(soilPos);
+                if (state.is(BlockTags.DIRT) || state.is(Blocks.GRASS_BLOCK)) {
+                    float coarseChance = step < trunkLength / 3 ? 0.45F : 0.28F;
+                    setGeneratedBlock(level, soilPos, random.nextFloat() < coarseChance ? Blocks.COARSE_DIRT.defaultBlockState() : Blocks.DIRT.defaultBlockState());
+                }
+                if (random.nextFloat() < 0.22F) {
+                    tryPlaceSoilBlock(level, soilPos.below(), Blocks.ROOTED_DIRT.defaultBlockState());
+                }
+            }
+        }
+    }
+
+    private static void placeVerticalCircularLayer(WorldGenLevel level, BlockPos origin, int worldY, float radius, Set<BlockPos> logPositions) {
+        int extent = Mth.ceil(radius) + 1;
+        for (int dx = -extent; dx <= extent; dx++) {
+            for (int dz = -extent; dz <= extent; dz++) {
+                if (Math.sqrt(dx * dx + dz * dz) <= radius + 0.08D) {
+                    placeWood(level, origin.offset(dx, worldY - origin.getY(), dz), logPositions);
+                }
+            }
+        }
+    }
+
+    private static void carveVerticalCircularLayer(WorldGenLevel level, BlockPos origin, int worldY, float radius, Set<BlockPos> logPositions) {
+        int extent = Mth.ceil(radius);
+        for (int dx = -extent; dx <= extent; dx++) {
+            for (int dz = -extent; dz <= extent; dz++) {
+                if (Math.sqrt(dx * dx + dz * dz) > radius) {
+                    continue;
+                }
+                BlockPos pos = origin.offset(dx, worldY - origin.getY(), dz);
+                if (level.getBlockState(pos).is(ModBlocks.BAOBAB_WOOD.get())) {
+                    level.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
+                    logPositions.remove(pos);
+                }
+            }
+        }
+    }
+
+    private static void placeHorizontalCircularLayer(WorldGenLevel level,
+                                                     BlockPos center,
+                                                     Direction.Axis axis,
+                                                     float radius,
+                                                     Set<BlockPos> logPositions) {
+        int extent = Mth.ceil(radius) + 1;
+        for (int lateral = -extent; lateral <= extent; lateral++) {
+            for (int dy = -extent; dy <= extent; dy++) {
+                if (Math.sqrt(lateral * lateral + dy * dy) > radius + 0.08D) {
+                    continue;
+                }
+                BlockPos pos = axis == Direction.Axis.X
+                        ? center.offset(0, dy, lateral)
+                        : center.offset(lateral, dy, 0);
+                placeWood(level, pos, logPositions);
+            }
+        }
+    }
+
+    private static void carveHorizontalCircularLayer(WorldGenLevel level,
+                                                     BlockPos center,
+                                                     Direction.Axis axis,
+                                                     float radius,
+                                                     Set<BlockPos> logPositions) {
+        int extent = Mth.ceil(radius);
+        for (int lateral = -extent; lateral <= extent; lateral++) {
+            for (int dy = -extent; dy <= extent; dy++) {
+                if (Math.sqrt(lateral * lateral + dy * dy) > radius) {
+                    continue;
+                }
+                BlockPos pos = axis == Direction.Axis.X
+                        ? center.offset(0, dy, lateral)
+                        : center.offset(lateral, dy, 0);
+                if (level.getBlockState(pos).is(ModBlocks.BAOBAB_WOOD.get())) {
+                    level.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
+                    logPositions.remove(pos);
+                }
+            }
+        }
+    }
+
+    private static void anchorFallenWood(WorldGenLevel level, Set<BlockPos> logPositions, int maxDepth) {
+        List<BlockPos> anchors = new ArrayList<>(logPositions);
+        anchors.sort(Comparator.comparingInt(BlockPos::getY));
+        for (BlockPos pos : anchors) {
+            int surfaceY = level.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, pos.getX(), pos.getZ()) - 1;
+            if (pos.getY() > surfaceY + 2) {
+                continue;
+            }
+            for (int depth = 1; depth <= maxDepth; depth++) {
+                BlockPos fillPos = pos.below(depth);
+                BlockState state = level.getBlockState(fillPos);
+                if (supportsFoundation(state)) {
+                    break;
+                }
+                if (!canReplace(state) && !state.is(BlockTags.LEAVES)) {
+                    break;
+                }
+                setGeneratedBlock(level, fillPos, ModBlocks.BAOBAB_WOOD.get().defaultBlockState());
+                logPositions.add(fillPos.immutable());
+            }
+        }
+    }
+
+    private static void placeFallenCanopy(WorldGenLevel level,
+                                          RandomSource random,
+                                          Direction direction,
+                                          List<BlockPos> trunkCenters,
+                                          List<LeafPadSeed> leafPadSeeds,
+                                          Set<BlockPos> logPositions,
+                                          Set<BlockPos> leafPositions) {
+        if (trunkCenters.isEmpty()) {
+            return;
+        }
+
+        double trunkAngle = Math.atan2(direction.getStepZ(), direction.getStepX());
+        int branchCount = 3 + random.nextInt(2);
+        for (int i = 0; i < branchCount; i++) {
+            int anchorIndex = Mth.clamp(Mth.floor((0.45F + random.nextFloat() * 0.35F) * (trunkCenters.size() - 1)), 0, trunkCenters.size() - 1);
+            BlockPos baseCenter = trunkCenters.get(anchorIndex);
+            Direction side = random.nextBoolean() ? direction.getClockWise() : direction.getCounterClockWise();
+            BlockPos anchor = baseCenter.relative(side).above(2 + random.nextInt(2));
+            double angle = trunkAngle + (side == direction.getClockWise() ? Math.PI / 2.0D : -Math.PI / 2.0D) + (random.nextDouble() - 0.5D) * 0.45D;
+            List<BlockPos> branch = placeFallenBranch(level, random, anchor, angle, 4 + random.nextInt(3), logPositions);
+            if (!branch.isEmpty()) {
+                leafPadSeeds.add(new LeafPadSeed(branch.get(branch.size() - 1), angle, 3 + random.nextInt(2)));
+            }
+        }
+
+        BlockPos tipCenter = trunkCenters.get(trunkCenters.size() - 1).above(2);
+        leafPadSeeds.add(new LeafPadSeed(tipCenter, trunkAngle + (random.nextDouble() - 0.5D) * 0.35D, 4));
+        leafPadSeeds.add(new LeafPadSeed(trunkCenters.get(Math.max(0, trunkCenters.size() / 2)).above(3), trunkAngle, 3));
+
+        for (LeafPadSeed seed : leafPadSeeds) {
+            placeFallenLeafCluster(level, random, seed, leafPositions, logPositions);
+        }
+    }
+
+    private static List<BlockPos> placeFallenBranch(WorldGenLevel level,
+                                                    RandomSource random,
+                                                    BlockPos start,
+                                                    double angle,
+                                                    int length,
+                                                    Set<BlockPos> logPositions) {
+        Vec3iLike p0 = new Vec3iLike(start.getX(), start.getY(), start.getZ());
+        Vec3iLike p1 = new Vec3iLike(
+                start.getX() + Mth.floor(Math.cos(angle) * Math.max(1.5D, length * 0.25D)),
+                start.getY() + 1,
+                start.getZ() + Mth.floor(Math.sin(angle) * Math.max(1.5D, length * 0.25D))
+        );
+        Vec3iLike p2 = new Vec3iLike(
+                start.getX() + Mth.floor(Math.cos(angle) * (length * 0.6D)),
+                start.getY() + 2 + random.nextInt(2),
+                start.getZ() + Mth.floor(Math.sin(angle) * (length * 0.6D))
+        );
+        Vec3iLike p3 = new Vec3iLike(
+                start.getX() + Mth.floor(Math.cos(angle) * length),
+                start.getY() + 2 + random.nextInt(2),
+                start.getZ() + Mth.floor(Math.sin(angle) * length)
+        );
+
+        List<BlockPos> samples = new ArrayList<>();
+        BlockPos previous = null;
+        int steps = Math.max(8, length * 4);
+        for (int step = 0; step <= steps; step++) {
+            float t = step / (float) steps;
+            Vec3Like point = bezier(p0, p1, p2, p3, t);
+            BlockPos current = BlockPos.containing(point.x(), point.y(), point.z());
+            if (previous != null && previous.equals(current)) {
+                continue;
+            }
+            placeWood(level, current, logPositions);
+            samples.add(current.immutable());
+            previous = current;
+        }
+
+        return samples;
+    }
+
+    private static void placeFallenLeafCluster(WorldGenLevel level,
+                                               RandomSource random,
+                                               LeafPadSeed seed,
+                                               Set<BlockPos> leafPositions,
+                                               Set<BlockPos> logPositions) {
+        int radius = Math.max(3, seed.radius());
+        BlockPos center = seed.tip().offset(
+                Mth.floor(Math.cos(seed.angle()) * Math.max(1, radius - 2)),
+                0,
+                Mth.floor(Math.sin(seed.angle()) * Math.max(1, radius - 2))
+        );
+        placeWood(level, center.below(), logPositions);
+        placeLeafTransition(level, seed.tip(), seed.angle(), leafPositions);
+        placeLeafPad(level, random, center, radius, 1, leafPositions);
+        if (random.nextFloat() < 0.65F) {
+            double sideAngle = seed.angle() + (random.nextBoolean() ? 0.75D : -0.75D);
+            BlockPos linked = center.offset(
+                    Mth.floor(Math.cos(sideAngle) * Math.max(1, radius - 2)),
+                    0,
+                    Mth.floor(Math.sin(sideAngle) * Math.max(1, radius - 2))
+            );
+            placeWood(level, linked.below(), logPositions);
+            placeLeafPad(level, random, linked, Math.max(2, radius - 1), 1, leafPositions);
+        }
+    }
+
+    private static void placeLeafTransition(WorldGenLevel level, BlockPos tip, double angle, Set<BlockPos> leafPositions) {
+        placeLeaf(level, tip.above(), leafPositions);
+        placeLeaf(level, tip.relative(sideDirection(angle, true)), leafPositions);
+        placeLeaf(level, tip.relative(sideDirection(angle, false)), leafPositions);
+        placeLeaf(level, tip.offset(Mth.floor(Math.cos(angle)), 0, Mth.floor(Math.sin(angle))), leafPositions);
+    }
+
+    private static Direction sideDirection(double angle, boolean positive) {
+        double sideAngle = angle + (positive ? Math.PI / 2.0D : -Math.PI / 2.0D);
+        return Math.abs(Math.cos(sideAngle)) > Math.abs(Math.sin(sideAngle))
+                ? (Math.cos(sideAngle) >= 0 ? Direction.EAST : Direction.WEST)
+                : (Math.sin(sideAngle) >= 0 ? Direction.SOUTH : Direction.NORTH);
+    }
+
+    private static void placeLeafPad(WorldGenLevel level,
+                                     RandomSource random,
+                                     BlockPos center,
+                                     int radius,
+                                     int verticalRadius,
+                                     Set<BlockPos> leafPositions) {
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dz = -radius; dz <= radius; dz++) {
+                for (int dy = -verticalRadius; dy <= verticalRadius; dy++) {
+                    double horizontal = Math.sqrt(dx * dx + dz * dz);
+                    if (horizontal > radius + 0.2D) {
+                        continue;
+                    }
+                    if (verticalRadius > 0 && horizontal > radius - 0.35D && Math.abs(dy) > 0 && random.nextFloat() < 0.45F) {
+                        continue;
+                    }
+                    if (horizontal > radius - 0.2D && random.nextFloat() < 0.28F) {
+                        continue;
+                    }
+
+                    BlockPos pos = center.offset(dx, dy, dz);
+                    placeLeaf(level, pos, leafPositions);
+                }
+            }
+        }
+    }
+
+    private static void finalizeGeneratedLeaves(WorldGenLevel level, Set<BlockPos> logPositions, Set<BlockPos> leafPositions) {
+        Map<BlockPos, Integer> distances = new HashMap<>();
+        ArrayDeque<BlockPos> queue = new ArrayDeque<>(logPositions);
+
+        while (!queue.isEmpty()) {
+            BlockPos current = queue.removeFirst();
+            int distance = distances.getOrDefault(current, 0);
+            if (distance >= 6) {
+                continue;
+            }
+
+            for (Direction direction : Direction.values()) {
+                BlockPos neighbor = current.relative(direction);
+                if (!leafPositions.contains(neighbor)) {
+                    continue;
+                }
+
+                int next = distance + 1;
+                int existing = distances.getOrDefault(neighbor, Integer.MAX_VALUE);
+                if (next < existing) {
+                    distances.put(neighbor, next);
+                    queue.addLast(neighbor);
+                }
+            }
+        }
+
+        for (BlockPos leafPos : leafPositions) {
+            BlockState state = level.getBlockState(leafPos);
+            if (state.is(ModBlocks.BAOBAB_LEAVES.get())) {
+                int distance = distances.getOrDefault(leafPos, 7);
+                setGeneratedBlock(level, leafPos, state.setValue(LeavesBlock.DISTANCE, Math.min(7, distance)).setValue(LeavesBlock.PERSISTENT, false));
+            }
+        }
+    }
+
+    private static void placeFallenFruitPods(WorldGenLevel level, RandomSource random, BlockPos origin, Set<BlockPos> leafPositions) {
+        List<BlockPos> candidates = new ArrayList<>();
+        for (BlockPos leafPos : leafPositions) {
+            BlockPos podPos = leafPos.below();
+            BlockState belowState = level.getBlockState(podPos);
+            if ((!belowState.isAir() && !belowState.canBeReplaced()) || leafPos.getY() < origin.getY() + 3) {
+                continue;
+            }
+            candidates.add(leafPos.immutable());
+        }
+
+        shufflePositions(random, candidates);
+        int targetCount = 2 + random.nextInt(3);
+        int placed = 0;
+        for (BlockPos leafPos : candidates) {
+            if (placed >= targetCount) {
+                break;
+            }
+            BlockPos podPos = leafPos.below();
+            BlockState state = ModBlocks.BAOBAB_FRUIT_POD.get().defaultBlockState()
+                    .setValue(de.artemis.baobabtree.common.block.BaobabFruitPodBlock.AGE, random.nextInt(4))
+                    .setValue(de.artemis.baobabtree.common.block.BaobabFruitPodBlock.FACING, Direction.Plane.HORIZONTAL.getRandomDirection(random));
+            if (!state.canSurvive(level, podPos)) {
+                continue;
+            }
+            setGeneratedBlock(level, podPos, state);
+            placed++;
+        }
+    }
+
+    private static void placeFallenGroundCover(WorldGenLevel level,
+                                               RandomSource random,
+                                               BlockPos origin,
+                                               Direction direction,
+                                               List<BlockPos> trunkCenters,
+                                               float stumpRadius) {
+        int radius = 7;
+        for (int dx = -radius; dx <= radius; dx++) {
+            for (int dz = -radius; dz <= radius; dz++) {
+                double distance = Math.sqrt(dx * dx + dz * dz);
+                if (distance > radius + 0.35D || distance < stumpRadius - 0.15D) {
+                    continue;
+                }
+
+                BlockPos supportPos = surfacePosAt(level, origin.getX() + dx, origin.getZ() + dz);
+                BlockPos placePos = supportPos.above();
+                BlockState supportState = level.getBlockState(supportPos);
+                if (!canPlaceDecorationOn(supportState) || !canReplace(level.getBlockState(placePos))) {
+                    continue;
+                }
+
+                if (random.nextFloat() < 0.42F) {
+                    setGeneratedBlock(level, placePos, ModBlocks.BAOBAB_LITTER.get().defaultBlockState()
+                            .setValue(PinkPetalsBlock.AMOUNT, 1 + random.nextInt(4))
+                            .setValue(PinkPetalsBlock.FACING, Direction.Plane.HORIZONTAL.getRandomDirection(random)));
+                } else if (random.nextFloat() < 0.38F) {
+                    BlockState foliage = random.nextInt(10) < 6
+                            ? Blocks.SHORT_GRASS.defaultBlockState()
+                            : random.nextInt(10) < 8 ? Blocks.FERN.defaultBlockState() : Blocks.DEAD_BUSH.defaultBlockState();
+                    if (foliage.canSurvive(level, placePos)) {
+                        setGeneratedBlock(level, placePos, foliage);
+                    }
+                }
+            }
+        }
+
+        if (trunkCenters.isEmpty()) {
+            return;
+        }
+
+        for (BlockPos center : trunkCenters) {
+            for (Direction side : Direction.Plane.HORIZONTAL) {
+                if (side == direction || side == direction.getOpposite()) {
+                    continue;
+                }
+                if (random.nextFloat() >= 0.22F) {
+                    continue;
+                }
+                BlockPos supportPos = surfacePosAt(level, center.getX() + side.getStepX(), center.getZ() + side.getStepZ());
+                BlockPos placePos = supportPos.above();
+                if (!canPlaceDecorationOn(level.getBlockState(supportPos)) || !canReplace(level.getBlockState(placePos))) {
+                    continue;
+                }
+                setGeneratedBlock(level, placePos, ModBlocks.BAOBAB_LITTER.get().defaultBlockState()
+                        .setValue(PinkPetalsBlock.AMOUNT, 1 + random.nextInt(3))
+                        .setValue(PinkPetalsBlock.FACING, Direction.Plane.HORIZONTAL.getRandomDirection(random)));
+            }
+        }
+    }
+
+    private static boolean canPlaceDecorationOn(BlockState state) {
+        return state.is(BlockTags.DIRT)
+                || state.is(Blocks.GRASS_BLOCK)
+                || state.is(Blocks.COARSE_DIRT)
+                || state.is(Blocks.DIRT)
+                || state.is(Blocks.ROOTED_DIRT)
+                || state.is(Blocks.SAND)
+                || state.is(Blocks.RED_SAND)
+                || state.is(ModBlocks.TREE_ROOT.get());
+    }
+
+    private static void shufflePositions(RandomSource random, List<BlockPos> positions) {
+        for (int i = positions.size() - 1; i > 0; i--) {
+            int swapIndex = random.nextInt(i + 1);
+            BlockPos tmp = positions.get(i);
+            positions.set(i, positions.get(swapIndex));
+            positions.set(swapIndex, tmp);
+        }
+    }
+
+    private static BlockPos surfacePosAt(WorldGenLevel level, int x, int z) {
+        return new BlockPos(x, level.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, x, z) - 1, z);
+    }
+
+    private static void placeLeaf(WorldGenLevel level, BlockPos pos, Set<BlockPos> leafPositions) {
+        BlockState state = level.getBlockState(pos);
+        if (canReplace(state) || state.is(ModBlocks.BAOBAB_LEAVES.get())) {
+            setGeneratedBlock(level, pos, ModBlocks.BAOBAB_LEAVES.get().defaultBlockState().setValue(LeavesBlock.PERSISTENT, false));
+            leafPositions.add(pos.immutable());
+        }
+    }
+
+    private static void placeWood(WorldGenLevel level, BlockPos pos, Set<BlockPos> logPositions) {
+        BlockState state = level.getBlockState(pos);
+        if (canReplace(state) || state.is(ModBlocks.BAOBAB_LEAVES.get())) {
+            setGeneratedBlock(level, pos, ModBlocks.BAOBAB_WOOD.get().defaultBlockState());
+            logPositions.add(pos.immutable());
+        }
+    }
+
+    private static boolean supportsFoundation(BlockState state) {
+        return isAllowedSoil(state)
+                || state.is(Blocks.ROOTED_DIRT)
+                || state.is(ModBlocks.TREE_ROOT.get())
+                || (!canReplace(state) && !state.is(BlockTags.LEAVES));
+    }
+
+    private static void tryPlaceSoilBlock(WorldGenLevel level, BlockPos pos, BlockState state) {
+        BlockState existing = level.getBlockState(pos);
+        if (existing.is(BlockTags.DIRT)
+                || existing.is(Blocks.GRASS_BLOCK)
+                || existing.is(Blocks.COARSE_DIRT)
+                || existing.is(Blocks.DIRT)
+                || existing.is(Blocks.ROOTED_DIRT)
+                || existing.is(Blocks.SAND)
+                || existing.is(Blocks.RED_SAND)) {
+            setGeneratedBlock(level, pos, state);
+        }
+    }
+
+    private static void setGeneratedBlock(WorldGenLevel level, BlockPos pos, BlockState newState) {
+        clearDoublePlantAt(level, pos);
+        level.setBlock(pos, newState, 2);
+    }
+
+    private static void clearDoublePlantAt(WorldGenLevel level, BlockPos pos) {
+        BlockState existing = level.getBlockState(pos);
+        if (!existing.hasProperty(DoublePlantBlock.HALF)) {
+            return;
+        }
+
+        DoubleBlockHalf half = existing.getValue(DoublePlantBlock.HALF);
+        BlockPos otherPos = half == DoubleBlockHalf.LOWER ? pos.above() : pos.below();
+        BlockState otherState = level.getBlockState(otherPos);
+        if (otherState.is(existing.getBlock()) && otherState.hasProperty(DoublePlantBlock.HALF)) {
+            level.setBlock(otherPos, Blocks.AIR.defaultBlockState(), 2);
+        }
+        level.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
     }
 
     private static final class GenerationState {
@@ -224,14 +841,20 @@ public final class BaobabTreeGenerator {
             int radius = Mth.ceil(baseRadius) + 2;
             for (int dx = -radius; dx <= radius; dx++) {
                 for (int dz = -radius; dz <= radius; dz++) {
-                    if (dx * dx + dz * dz > (radius + 0.75F) * (radius + 0.75F) || random.nextFloat() < 0.18F) {
+                    if (dx * dx + dz * dz > (radius + 0.75F) * (radius + 0.75F)) {
                         continue;
                     }
 
-                    BlockPos soilPos = origin.offset(dx, -1, dz);
+                    BlockPos soilPos = surfacePosAt(origin.getX() + dx, origin.getZ() + dz);
                     BlockState state = level.getBlockState(soilPos);
+                    if (Math.abs(soilPos.getY() - (origin.getY() - 1)) > variant.maxSlope) {
+                        continue;
+                    }
+                    if (!isAncientInterior(dx, dz) && random.nextFloat() < 0.18F) {
+                        continue;
+                    }
                     if (state.is(BlockTags.DIRT) || state.is(Blocks.GRASS_BLOCK)) {
-                        level.setBlock(soilPos, random.nextFloat() < 0.55F ? Blocks.COARSE_DIRT.defaultBlockState() : Blocks.DIRT.defaultBlockState(), 2);
+                        setGeneratedBlock(soilPos, random.nextFloat() < 0.55F ? Blocks.COARSE_DIRT.defaultBlockState() : Blocks.DIRT.defaultBlockState());
                     }
                 }
             }
@@ -244,11 +867,13 @@ public final class BaobabTreeGenerator {
                 case YOUNG -> 3 + random.nextInt(2);
                 case MATURE -> 4 + random.nextInt(2);
                 case ANCIENT -> 5 + random.nextInt(2);
+                case FALLEN -> 4 + random.nextInt(2);
             };
             int armLength = switch (variant) {
                 case YOUNG -> 2 + random.nextInt(2);
                 case MATURE -> 3 + random.nextInt(2);
                 case ANCIENT -> 4 + random.nextInt(2);
+                case FALLEN -> 3 + random.nextInt(2);
             };
             double startAngle = random.nextDouble() * Mth.TWO_PI;
 
@@ -307,8 +932,20 @@ public final class BaobabTreeGenerator {
                         continue;
                     }
 
-                    BlockPos topPos = origin.offset(dx, -1, dz);
+                    BlockPos topPos = surfacePosAt(origin.getX() + dx, origin.getZ() + dz);
+                    if (Math.abs(topPos.getY() - (origin.getY() - 1)) > variant.maxSlope) {
+                        continue;
+                    }
                     BlockPos belowPos = topPos.below();
+                    if (isAncientInterior(dx, dz)) {
+                        if (level.getBlockState(topPos).is(BlockTags.DIRT) || level.getBlockState(topPos).is(Blocks.GRASS_BLOCK)) {
+                            setGeneratedBlock(topPos, random.nextFloat() < 0.6F ? Blocks.COARSE_DIRT.defaultBlockState() : Blocks.DIRT.defaultBlockState());
+                        }
+                        if (random.nextFloat() < 0.5F) {
+                            placeRootedDirt(belowPos);
+                        }
+                        continue;
+                    }
                     if (distance > baseRadius - 0.45D && random.nextFloat() < 0.22F) {
                         Direction.Axis axis = radialAxis(dx, dz);
                         placeSurfaceRoot(topPos, axis);
@@ -323,6 +960,38 @@ public final class BaobabTreeGenerator {
             }
         }
 
+        private void anchorTrunkBase() {
+            int radius = Mth.ceil(baseRadius + 0.7F);
+            int maxDepth = variant.maxSlope + 3;
+            for (int dx = -radius; dx <= radius; dx++) {
+                for (int dz = -radius; dz <= radius; dz++) {
+                    double distance = Math.sqrt(dx * dx + dz * dz);
+                    if (distance > baseRadius + 0.15D) {
+                        continue;
+                    }
+
+                    BlockPos trunkPos = origin.offset(dx, 0, dz);
+                    if (!logPositions.contains(trunkPos)) {
+                        continue;
+                    }
+
+                    for (int depth = 1; depth <= maxDepth; depth++) {
+                        BlockPos fillPos = trunkPos.below(depth);
+                        BlockState fillState = level.getBlockState(fillPos);
+                        if (supportsFoundation(fillState)) {
+                            break;
+                        }
+                        if (!canReplace(fillState) && !fillState.is(BlockTags.LEAVES)) {
+                            break;
+                        }
+
+                        setGeneratedBlock(fillPos, ModBlocks.BAOBAB_WOOD.get().defaultBlockState());
+                        logPositions.add(fillPos.immutable());
+                    }
+                }
+            }
+        }
+
         private void placeSurfaceRoot(BlockPos pos, Direction.Axis axis) {
             if (!canReplaceSoilAt(pos)) {
                 return;
@@ -332,21 +1001,21 @@ public final class BaobabTreeGenerator {
             if (!aboveState.isAir() && !aboveState.canBeReplaced()) {
                 return;
             }
-            level.setBlock(pos, ModBlocks.TREE_ROOT.get().defaultBlockState().setValue(RotatedPillarBlock.AXIS, axis), 2);
+            setGeneratedBlock(pos, ModBlocks.TREE_ROOT.get().defaultBlockState().setValue(RotatedPillarBlock.AXIS, axis));
         }
 
         private void placeBuriedRoot(BlockPos pos, Direction.Axis axis) {
             if (!canReplaceSoilAt(pos)) {
                 return;
             }
-            level.setBlock(pos, ModBlocks.TREE_ROOT.get().defaultBlockState().setValue(RotatedPillarBlock.AXIS, axis), 2);
+            setGeneratedBlock(pos, ModBlocks.TREE_ROOT.get().defaultBlockState().setValue(RotatedPillarBlock.AXIS, axis));
         }
 
         private void placeRootedDirt(BlockPos pos) {
             if (!canReplaceSoilAt(pos)) {
                 return;
             }
-            level.setBlock(pos, Blocks.ROOTED_DIRT.defaultBlockState(), 2);
+            setGeneratedBlock(pos, Blocks.ROOTED_DIRT.defaultBlockState());
         }
 
         private Direction.Axis radialAxis(int dx, int dz) {
@@ -367,11 +1036,24 @@ public final class BaobabTreeGenerator {
                     || state.is(Blocks.SAND);
         }
 
+        private boolean supportsFoundation(BlockState state) {
+            return isAllowedSoil(state)
+                    || state.is(Blocks.ROOTED_DIRT)
+                    || state.is(ModBlocks.TREE_ROOT.get())
+                    || (!canReplace(state) && !state.is(BlockTags.LEAVES));
+        }
+
+        private BlockPos surfacePosAt(int x, int z) {
+            int surfaceY = level.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, x, z) - 1;
+            return new BlockPos(x, surfaceY, z);
+        }
+
         private void placeGroundCover() {
             int radius = switch (variant) {
                 case YOUNG -> 4;
                 case MATURE -> 6;
                 case ANCIENT -> 7;
+                case FALLEN -> 6;
             };
 
             for (int dx = -radius; dx <= radius; dx++) {
@@ -399,6 +1081,12 @@ public final class BaobabTreeGenerator {
                     if (!canPlaceGroundCoverOn(supportState) || !canPlaceDecorationAt(placeState)) {
                         continue;
                     }
+                    if (isAncientInterior(dx, dz)) {
+                        if (supportState.is(Blocks.GRASS_BLOCK)) {
+                            setGeneratedBlock(supportPos, random.nextFloat() < 0.6F ? Blocks.COARSE_DIRT.defaultBlockState() : Blocks.DIRT.defaultBlockState());
+                        }
+                        continue;
+                    }
                     if (supportState.is(ModBlocks.TREE_ROOT.get()) && random.nextFloat() < 0.75F) {
                         continue;
                     }
@@ -411,11 +1099,22 @@ public final class BaobabTreeGenerator {
                     }
 
                     float foliageChance = 0.22F + normalized * 0.24F;
+                    if (variant == Variant.ANCIENT && normalized > 0.45F) {
+                        foliageChance += 0.12F;
+                    }
                     if (random.nextFloat() < foliageChance) {
                         placeFoliage(placePos, supportPos);
                     }
                 }
             }
+        }
+
+        private boolean isAncientInterior(int dx, int dz) {
+            if (variant != Variant.ANCIENT) {
+                return false;
+            }
+            float interiorRadius = Math.max(1.35F, radiusAtHeight(0.0F) - 1.45F);
+            return dx * dx + dz * dz <= interiorRadius * interiorRadius;
         }
 
         private boolean canPlaceGroundCoverOn(BlockState state) {
@@ -446,12 +1145,17 @@ public final class BaobabTreeGenerator {
                 default -> 4;
             };
             Direction facing = Direction.Plane.HORIZONTAL.getRandomDirection(random);
-            BlockState litterState = ModBlocks.BAOBAB_LITTER.get().defaultBlockState()
+            BlockState litterState = de.artemis.baobabtree.common.block.BaobabLitterBlock.clearPodState(ModBlocks.BAOBAB_LITTER.get().defaultBlockState())
                     .setValue(PinkPetalsBlock.AMOUNT, amount)
-                    .setValue(PinkPetalsBlock.FACING, facing)
-                    .setValue(de.artemis.baobabtree.common.block.BaobabLitterBlock.HAS_FRUIT, random.nextFloat() < amount * 0.07F);
+                    .setValue(PinkPetalsBlock.FACING, facing);
+            if (random.nextFloat() < amount * 0.07F) {
+                float podRoll = random.nextFloat();
+                litterState = litterState.setValue(de.artemis.baobabtree.common.block.BaobabLitterBlock.HAS_SMALL, podRoll < 0.55F);
+                litterState = litterState.setValue(de.artemis.baobabtree.common.block.BaobabLitterBlock.HAS_MEDIUM, podRoll >= 0.55F && podRoll < 0.85F);
+                litterState = litterState.setValue(de.artemis.baobabtree.common.block.BaobabLitterBlock.HAS_LARGE, podRoll >= 0.85F);
+            }
             if (litterState.canSurvive(level, placePos)) {
-                level.setBlock(placePos, litterState, 2);
+                setGeneratedBlock(placePos, litterState);
             }
         }
 
@@ -472,17 +1176,34 @@ public final class BaobabTreeGenerator {
             }
 
             if (foliageState.canSurvive(level, placePos)) {
-                level.setBlock(placePos, foliageState, 2);
+                setGeneratedBlock(placePos, foliageState);
             }
         }
 
         private void placeTrunk() {
-            int flareHeight = variant == Variant.YOUNG ? 2 : variant == Variant.MATURE ? 3 : 4;
+            int flareHeight = switch (variant) {
+                case YOUNG -> 2;
+                case MATURE, FALLEN -> 3;
+                case ANCIENT -> 4;
+            };
             for (int y = 0; y < trunkHeight; y++) {
                 float t = y / (float) Math.max(1, trunkHeight - 1);
                 float radius = radiusAtHeight(t);
                 float flareExtra = y < flareHeight ? (1.0F - y / (float) flareHeight) * 0.18F : 0.0F;
                 placeCircularLayer(origin.getY() + y, radius + flareExtra);
+            }
+        }
+
+        private void carveAncientHollow() {
+            if (variant != Variant.ANCIENT) {
+                return;
+            }
+
+            for (int y = 0; y < trunkHeight; y++) {
+                float t = y / (float) Math.max(1, trunkHeight - 1);
+                float outerRadius = radiusAtHeight(t);
+                float hollowRadius = Math.max(1.35F, outerRadius - 1.45F);
+                carveCircularLayer(origin.getY() + y, hollowRadius);
             }
         }
 
@@ -507,6 +1228,26 @@ public final class BaobabTreeGenerator {
                     if (distance <= radius + 0.08D) {
                         placeLog(origin.offset(dx, worldY - origin.getY(), dz), Direction.Axis.Y, false);
                     }
+                }
+            }
+        }
+
+        private void carveCircularLayer(int worldY, float radius) {
+            int extent = Mth.ceil(radius);
+            for (int dx = -extent; dx <= extent; dx++) {
+                for (int dz = -extent; dz <= extent; dz++) {
+                    double distance = Math.sqrt(dx * dx + dz * dz);
+                    if (distance > radius) {
+                        continue;
+                    }
+
+                    BlockPos pos = origin.offset(dx, worldY - origin.getY(), dz);
+                    if (!level.getBlockState(pos).is(ModBlocks.BAOBAB_WOOD.get())) {
+                        continue;
+                    }
+
+                    level.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
+                    logPositions.remove(pos);
                 }
             }
         }
@@ -568,7 +1309,7 @@ public final class BaobabTreeGenerator {
             }
             double branchReach = switch (variant) {
                 case YOUNG -> Math.min(effectiveLength, 4.6D);
-                case MATURE, ANCIENT -> effectiveLength;
+                case MATURE, ANCIENT, FALLEN -> effectiveLength;
             };
 
             int rise = lighter ? random.nextInt(2) : 1;
@@ -655,6 +1396,7 @@ public final class BaobabTreeGenerator {
                 case YOUNG -> 1;
                 case MATURE -> 1;
                 case ANCIENT -> 1 + random.nextInt(2);
+                case FALLEN -> 1;
             };
             BlockPos center = seed.tip().offset(
                     Mth.floor(Math.cos(seed.angle()) * Math.max(0, radius - 2)),
@@ -705,7 +1447,7 @@ public final class BaobabTreeGenerator {
 
         private void placeLeafIfPossible(BlockPos pos) {
             if (canReplace(level.getBlockState(pos))) {
-                level.setBlock(pos, ModBlocks.BAOBAB_LEAVES.get().defaultBlockState(), 2);
+                setGeneratedBlock(pos, ModBlocks.BAOBAB_LEAVES.get().defaultBlockState());
                 leafPositions.add(pos.immutable());
             }
         }
@@ -731,7 +1473,7 @@ public final class BaobabTreeGenerator {
 
                         BlockPos pos = center.offset(dx, dy, dz);
                         if (canReplace(level.getBlockState(pos))) {
-                            level.setBlock(pos, ModBlocks.BAOBAB_LEAVES.get().defaultBlockState().setValue(LeavesBlock.PERSISTENT, false), 2);
+                            setGeneratedBlock(pos, ModBlocks.BAOBAB_LEAVES.get().defaultBlockState().setValue(LeavesBlock.PERSISTENT, false));
                             leafPositions.add(pos.immutable());
                         }
                     }
@@ -769,7 +1511,7 @@ public final class BaobabTreeGenerator {
                 BlockState state = level.getBlockState(leafPos);
                 if (state.is(ModBlocks.BAOBAB_LEAVES.get())) {
                     int distance = distances.getOrDefault(leafPos, 7);
-                    level.setBlock(leafPos, state.setValue(LeavesBlock.DISTANCE, Math.min(7, distance)).setValue(LeavesBlock.PERSISTENT, false), 2);
+                    setGeneratedBlock(leafPos, state.setValue(LeavesBlock.DISTANCE, Math.min(7, distance)).setValue(LeavesBlock.PERSISTENT, false));
                 }
             }
         }
@@ -800,6 +1542,7 @@ public final class BaobabTreeGenerator {
                 case YOUNG -> 3 + random.nextInt(4);
                 case MATURE -> 6 + random.nextInt(7);
                 case ANCIENT -> 9 + random.nextInt(7);
+                case FALLEN -> 4 + random.nextInt(4);
             };
 
             int placed = 0;
@@ -816,7 +1559,7 @@ public final class BaobabTreeGenerator {
                     continue;
                 }
 
-                level.setBlock(podPos, state, 2);
+                setGeneratedBlock(podPos, state);
                 placed++;
             }
         }
@@ -838,7 +1581,7 @@ public final class BaobabTreeGenerator {
             BlockState state = ModBlocks.BAOBAB_WOOD.get().defaultBlockState();
 
             if (canReplace(level.getBlockState(pos)) || level.getBlockState(pos).is(ModBlocks.BAOBAB_LEAVES.get())) {
-                level.setBlock(pos, state, 2);
+                setGeneratedBlock(pos, state);
                 logPositions.add(pos.immutable());
             }
         }
@@ -847,9 +1590,29 @@ public final class BaobabTreeGenerator {
             BlockState state = ModBlocks.BAOBAB_WOOD.get().defaultBlockState();
 
             if (canReplace(level.getBlockState(pos)) || level.getBlockState(pos).is(ModBlocks.BAOBAB_LEAVES.get())) {
-                level.setBlock(pos, state, 2);
+                setGeneratedBlock(pos, state);
                 logPositions.add(pos.immutable());
             }
+        }
+
+        private void setGeneratedBlock(BlockPos pos, BlockState newState) {
+            clearDoublePlantAt(pos);
+            level.setBlock(pos, newState, 2);
+        }
+
+        private void clearDoublePlantAt(BlockPos pos) {
+            BlockState existing = level.getBlockState(pos);
+            if (!existing.hasProperty(DoublePlantBlock.HALF)) {
+                return;
+            }
+
+            DoubleBlockHalf half = existing.getValue(DoublePlantBlock.HALF);
+            BlockPos otherPos = half == DoubleBlockHalf.LOWER ? pos.above() : pos.below();
+            BlockState otherState = level.getBlockState(otherPos);
+            if (otherState.is(existing.getBlock()) && otherState.hasProperty(DoublePlantBlock.HALF)) {
+                level.setBlock(otherPos, Blocks.AIR.defaultBlockState(), 2);
+            }
+            level.setBlock(pos, Blocks.AIR.defaultBlockState(), 2);
         }
     }
 

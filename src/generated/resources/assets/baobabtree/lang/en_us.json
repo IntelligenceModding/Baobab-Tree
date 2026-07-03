@@ -25,8 +25,14 @@
   "block.baobabtree.tree_root": "Tree Root",
   "item.baobabtree.baobab_boat": "Baobab Boat",
   "item.baobabtree.baobab_chest_boat": "Baobab Chest Boat",
-  "item.baobabtree.baobab_fruit_piece": "Baobab Fruit Piece",
-  "item.baobabtree.baobab_seeds": "Baobab Seeds",
-  "item.baobabtree.dried_baobab_pulp": "Dried Baobab Pulp",
-  "itemGroup.baobabtree": "Baobab Tree"
+  "item.baobabtree.baobab_fruit": "Baobab Fruit",
+  "itemGroup.baobabtree": "Baobab Tree",
+  "jei.baobabtree.baobab_fruit": "Can be eaten or planted on the underside of baobab leaves to start a hanging fruit pod.",
+  "jei.baobabtree.baobab_fruit_pod": "Grows under baobab leaves from planted fruit. Right-click a grown pod to harvest the pod itself and leave the base to regrow.",
+  "jei.baobabtree.baobab_litter": "Rummage it by hand to clear the whole pile at once. Thicker piles have better loot odds. Pickaxes strip it layer by layer instead.",
+  "jei.baobabtree.baobab_sapling": "Needs a 2x2 to grow. A grown sapling cluster only creates the young tree, without the natural ground clutter.",
+  "jei.baobabtree.large_baobab_fruit_pod": "Harvest with an axe or sword for 6 baobab fruit. Ripe hanging pods can drop on their own, and large fallen pods hit the hardest.",
+  "jei.baobabtree.medium_baobab_fruit_pod": "Harvest with an axe or sword for 4 baobab fruit. Medium fallen pods hit harder than small ones.",
+  "jei.baobabtree.small_baobab_fruit_pod": "Harvest with an axe or sword for 2 baobab fruit. Small fallen pods deal the least impact damage.",
+  "jei.baobabtree.tree_root": "Acts like a climbable root block. Axe harvests it into loose material, while a shovel turns it into dirt and drops hanging roots."
 }

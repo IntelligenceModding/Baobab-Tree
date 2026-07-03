@@ -48,10 +48,13 @@ public final class ClientModEvents {
                         level != null && pos != null
                                 ? BiomeColors.getAverageFoliageColor(level, pos)
                                 : FoliageColor.getDefaultColor(),
-                ModBlocks.BAOBAB_LEAVES.get());
+                ModBlocks.BAOBAB_LEAVES.get(),
+                ModBlocks.BAOBAB_LITTER.get());
     }
 
     public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
-        event.register((stack, tintIndex) -> FoliageColor.getDefaultColor(), ModBlocks.BAOBAB_LEAVES.get());
+        event.register((stack, tintIndex) -> FoliageColor.getDefaultColor(),
+                ModBlocks.BAOBAB_LEAVES.get(),
+                ModBlocks.BAOBAB_LITTER.get());
     }
 }

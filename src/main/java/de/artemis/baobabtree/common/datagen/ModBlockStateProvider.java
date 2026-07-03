@@ -37,35 +37,35 @@ public class ModBlockStateProvider extends BlockStateProvider {
 
     @Override
     protected void registerStatesAndModels() {
-        logBlock(ModBlocks.BAOBAB_LOG.get(), mcLoc("block/acacia_log"), mcLoc("block/acacia_log_top"));
-        woodBlock(ModBlocks.BAOBAB_WOOD.get(), mcLoc("block/acacia_log"));
-        logBlock(ModBlocks.STRIPPED_BAOBAB_LOG.get(), mcLoc("block/stripped_acacia_log"), mcLoc("block/stripped_acacia_log_top"));
-        woodBlock(ModBlocks.STRIPPED_BAOBAB_WOOD.get(), mcLoc("block/stripped_acacia_log"));
+        logBlock(ModBlocks.BAOBAB_LOG.get(), modLoc("block/baobab_log"), modLoc("block/baobab_log_top"));
+        woodBlock(ModBlocks.BAOBAB_WOOD.get(), modLoc("block/baobab_log"));
+        logBlock(ModBlocks.STRIPPED_BAOBAB_LOG.get(), modLoc("block/stripped_baobab_log"), modLoc("block/stripped_baobab_log_top"));
+        woodBlock(ModBlocks.STRIPPED_BAOBAB_WOOD.get(), modLoc("block/stripped_baobab_log"));
 
-        planksBlock(ModBlocks.BAOBAB_PLANKS.get(), mcLoc("block/acacia_planks"));
-        stairsBlockFromTexture(ModBlocks.BAOBAB_STAIRS.get(), mcLoc("block/acacia_planks"));
-        slabBlockFromTexture(ModBlocks.BAOBAB_SLAB.get(), mcLoc("block/acacia_planks"));
-        fenceBlockFromTexture(ModBlocks.BAOBAB_FENCE.get(), mcLoc("block/acacia_planks"));
-        fenceGateBlockFromTexture(ModBlocks.BAOBAB_FENCE_GATE.get(), mcLoc("block/acacia_planks"));
-        buttonBlockFromTexture(ModBlocks.BAOBAB_BUTTON.get(), mcLoc("block/acacia_planks"));
-        pressurePlateBlockFromTexture(ModBlocks.BAOBAB_PRESSURE_PLATE.get(), mcLoc("block/acacia_planks"));
-        doorBlockFromTexture(ModBlocks.BAOBAB_DOOR.get(), mcLoc("block/acacia_door_bottom"), mcLoc("block/acacia_door_top"));
-        trapdoorBlockFromTexture(ModBlocks.BAOBAB_TRAPDOOR.get(), mcLoc("block/acacia_trapdoor"));
+        planksBlock(ModBlocks.BAOBAB_PLANKS.get(), modLoc("block/baobab_planks"));
+        stairsBlockFromTexture(ModBlocks.BAOBAB_STAIRS.get(), modLoc("block/baobab_planks"));
+        slabBlockFromTexture(ModBlocks.BAOBAB_SLAB.get(), modLoc("block/baobab_planks"));
+        fenceBlockFromTexture(ModBlocks.BAOBAB_FENCE.get(), modLoc("block/baobab_planks"));
+        fenceGateBlockFromTexture(ModBlocks.BAOBAB_FENCE_GATE.get(), modLoc("block/baobab_planks"));
+        buttonBlockFromTexture(ModBlocks.BAOBAB_BUTTON.get(), modLoc("block/baobab_planks"));
+        pressurePlateBlockFromTexture(ModBlocks.BAOBAB_PRESSURE_PLATE.get(), modLoc("block/baobab_planks"));
+        doorBlockFromTexture(ModBlocks.BAOBAB_DOOR.get(), modLoc("block/baobab_door_bottom"), modLoc("block/baobab_door_top"));
+        trapdoorBlockFromTexture(ModBlocks.BAOBAB_TRAPDOOR.get(), modLoc("block/baobab_trapdoor"));
 
         signBlock(
                 (StandingSignBlock) ModBlocks.BAOBAB_SIGN.get(),
                 (WallSignBlock) ModBlocks.BAOBAB_WALL_SIGN.get(),
-                mcLoc("block/acacia_planks")
+                modLoc("block/baobab_planks")
         );
         hangingSignBlock(
                 (CeilingHangingSignBlock) ModBlocks.BAOBAB_HANGING_SIGN.get(),
                 (WallHangingSignBlock) ModBlocks.BAOBAB_WALL_HANGING_SIGN.get(),
-                mcLoc("block/acacia_planks")
+                modLoc("block/baobab_planks")
         );
 
-        leavesBlock(ModBlocks.BAOBAB_LEAVES.get(), mcLoc("block/acacia_leaves"));
-        saplingBlock(ModBlocks.BAOBAB_SAPLING.get(), mcLoc("block/acacia_sapling"));
-        pottedPlantBlock(ModBlocks.POTTED_BAOBAB_SAPLING.get(), mcLoc("block/acacia_sapling"));
+        leavesBlock(ModBlocks.BAOBAB_LEAVES.get(), modLoc("block/baobab_leaves"));
+        saplingBlock(ModBlocks.BAOBAB_SAPLING.get(), modLoc("block/baobab_sapling"));
+        pottedPlantBlock(ModBlocks.POTTED_BAOBAB_SAPLING.get(), modLoc("block/baobab_sapling"));
 
         litterBlock();
 
@@ -131,7 +131,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
     private void doorBlockFromTexture(Block block, ResourceLocation bottom, ResourceLocation top) {
         doorBlockWithRenderType((DoorBlock) block, bottom, top, "cutout");
         simpleBlockItem(block, models().withExistingParent(BuiltInRegistries.BLOCK.getKey(block).getPath(), mcLoc("item/generated"))
-                .texture("layer0", mcLoc("item/acacia_door")));
+                .texture("layer0", modLoc("item/baobab_door")));
     }
 
     private void trapdoorBlockFromTexture(Block block, ResourceLocation texture) {
@@ -228,9 +228,9 @@ public class ModBlockStateProvider extends BlockStateProvider {
                 .texture("particle", modLoc("block/baobab_fruit_pod_stage0"))
                 .renderType("cutout");
         ModelFile[] podStages = new ModelFile[]{
-                podModel("baobab_fruit_pod_growth_stage1", 6.0F, 8.0F, 6.0F, 10.0F, 14.0F, 10.0F, "1", 4.0F, 6.0F, 4.0F),
-                podModel("baobab_fruit_pod_growth_stage2", 4.0F, 4.0F, 4.0F, 12.0F, 14.0F, 12.0F, "2", 8.0F, 10.0F, 8.0F),
-                podModel("baobab_fruit_pod_growth_stage3", 2.0F, 2.0F, 2.0F, 14.0F, 14.0F, 14.0F, "3", 12.0F, 12.0F, 12.0F)
+                podModel("baobab_fruit_pod_growth_stage1", 6.0F, 7.0F, 6.0F, 10.0F, 13.0F, 10.0F, "1", 4.0F, 6.0F, 4.0F),
+                podModel("baobab_fruit_pod_growth_stage2", 4.0F, 3.0F, 4.0F, 12.0F, 13.0F, 12.0F, "2", 8.0F, 10.0F, 8.0F),
+                podModel("baobab_fruit_pod_growth_stage3", 2.0F, 1.0F, 2.0F, 14.0F, 13.0F, 14.0F, "3", 12.0F, 12.0F, 12.0F)
         };
 
         directionalPodBlock(
@@ -254,7 +254,6 @@ public class ModBlockStateProvider extends BlockStateProvider {
                 builder.part()
                         .modelFile(base)
                         .rotationY(rotationY)
-                        .uvLock(true)
                         .addModel()
                         .condition(BaobabFruitPodBlock.FACING, facing)
                         .condition(BaobabFruitPodBlock.AGE, age);
@@ -264,7 +263,6 @@ public class ModBlockStateProvider extends BlockStateProvider {
                 builder.part()
                         .modelFile(podStages[age - 1])
                         .rotationY(rotationY)
-                        .uvLock(true)
                         .addModel()
                         .condition(BaobabFruitPodBlock.FACING, facing)
                         .condition(BaobabFruitPodBlock.AGE, age);
@@ -297,8 +295,8 @@ public class ModBlockStateProvider extends BlockStateProvider {
                 .face(Direction.SOUTH).texture("#side").uvs(0.0F, 0.0F, uvWidth, uvHeight).end()
                 .face(Direction.WEST).texture("#side").uvs(0.0F, 0.0F, uvDepth, uvHeight).end()
                 .face(Direction.EAST).texture("#side").uvs(0.0F, 0.0F, uvDepth, uvHeight).end()
-                .face(Direction.UP).texture("#end").uvs(0.0F, 0.0F, 16.0F, 16.0F).cullface(Direction.UP).end()
-                .face(Direction.DOWN).texture("#end").uvs(16.0F, 16.0F, 0.0F, 0.0F).cullface(Direction.DOWN).end()
+                .face(Direction.UP).texture("#end").uvs(0.0F, 0.0F, uvWidth, uvDepth).end()
+                .face(Direction.DOWN).texture("#end").uvs(uvWidth, uvDepth, 0.0F, 0.0F).end()
                 .end();
     }
 
@@ -309,7 +307,6 @@ public class ModBlockStateProvider extends BlockStateProvider {
             return ConfiguredModel.builder()
                     .modelFile(model)
                     .rotationY(rotationY)
-                    .uvLock(true)
                     .build();
         });
         simpleBlockItem(block, model);

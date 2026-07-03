@@ -20,7 +20,7 @@
               "condition": "minecraft:survives_explosion"
             }
           ],
-          "name": "baobabtree:baobab_seeds"
+          "name": "baobabtree:baobab_fruit"
         }
       ],
       "rolls": 1.0
@@ -44,7 +44,14 @@
               "condition": "minecraft:survives_explosion"
             }
           ],
-          "name": "baobabtree:baobab_fruit_piece"
+          "functions": [
+            {
+              "add": false,
+              "count": 2.0,
+              "function": "minecraft:set_count"
+            }
+          ],
+          "name": "baobabtree:baobab_fruit"
         }
       ],
       "rolls": 1.0
@@ -71,11 +78,11 @@
           "functions": [
             {
               "add": false,
-              "count": 2.0,
+              "count": 4.0,
               "function": "minecraft:set_count"
             }
           ],
-          "name": "baobabtree:baobab_fruit_piece"
+          "name": "baobabtree:baobab_fruit"
         }
       ],
       "rolls": 1.0
@@ -102,11 +109,11 @@
           "functions": [
             {
               "add": false,
-              "count": 3.0,
+              "count": 6.0,
               "function": "minecraft:set_count"
             }
           ],
-          "name": "baobabtree:baobab_fruit_piece"
+          "name": "baobabtree:baobab_fruit"
         }
       ],
       "rolls": 1.0

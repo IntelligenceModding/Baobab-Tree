@@ -27,9 +27,7 @@ public class ModDataMapProvider extends DataMapProvider {
                 .add(ModBlocks.SMALL_BAOBAB_FRUIT_POD.getId(), new Compostable(0.5F), false)
                 .add(ModBlocks.MEDIUM_BAOBAB_FRUIT_POD.getId(), new Compostable(0.5F), false)
                 .add(ModBlocks.LARGE_BAOBAB_FRUIT_POD.getId(), new Compostable(0.5F), false)
-                .add(ModItems.BAOBAB_FRUIT_PIECE.getId(), new Compostable(0.65F), false)
-                .add(ModItems.DRIED_BAOBAB_PULP.getId(), new Compostable(0.85F), false)
-                .add(ModItems.BAOBAB_SEEDS.getId(), new Compostable(0.3F), false);
+                .add(ModItems.BAOBAB_FRUIT.getId(), new Compostable(0.65F), false);
 
         builder(NeoForgeDataMaps.FURNACE_FUELS)
                 .add(ModItems.BAOBAB_BOAT.getId(), new FurnaceFuel(1200), false)

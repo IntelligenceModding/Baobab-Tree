@@ -43,9 +43,7 @@ public final class ModCreativeModeTabs {
                         output.accept(ModBlocks.SMALL_BAOBAB_FRUIT_POD);
                         output.accept(ModBlocks.MEDIUM_BAOBAB_FRUIT_POD);
                         output.accept(ModBlocks.LARGE_BAOBAB_FRUIT_POD);
-                        output.accept(ModItems.BAOBAB_FRUIT_PIECE);
-                        output.accept(ModItems.DRIED_BAOBAB_PULP);
-                        output.accept(ModItems.BAOBAB_SEEDS);
+                        output.accept(ModItems.BAOBAB_FRUIT);
                         output.accept(ModItems.BAOBAB_BOAT);
                         output.accept(ModItems.BAOBAB_CHEST_BOAT);
                     })

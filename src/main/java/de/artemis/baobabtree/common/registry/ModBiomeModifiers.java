@@ -17,9 +17,11 @@ public final class ModBiomeModifiers {
     public static final ResourceKey<BiomeModifier> ADD_YOUNG_BAOBABS = registerKey("add_young_baobabs");
     public static final ResourceKey<BiomeModifier> ADD_MATURE_BAOBABS = registerKey("add_mature_baobabs");
     public static final ResourceKey<BiomeModifier> ADD_ANCIENT_BAOBABS = registerKey("add_ancient_baobabs");
+    public static final ResourceKey<BiomeModifier> ADD_FALLEN_BAOBABS = registerKey("add_fallen_baobabs");
     public static final ResourceKey<BiomeModifier> ADD_WINDSWEPT_YOUNG_BAOBABS = registerKey("add_windswept_young_baobabs");
     public static final ResourceKey<BiomeModifier> ADD_WINDSWEPT_MATURE_BAOBABS = registerKey("add_windswept_mature_baobabs");
     public static final ResourceKey<BiomeModifier> ADD_WINDSWEPT_ANCIENT_BAOBABS = registerKey("add_windswept_ancient_baobabs");
+    public static final ResourceKey<BiomeModifier> ADD_WINDSWEPT_FALLEN_BAOBABS = registerKey("add_windswept_fallen_baobabs");
 
     private ModBiomeModifiers() {
     }
@@ -46,6 +48,12 @@ public final class ModBiomeModifiers {
                 GenerationStep.Decoration.VEGETAL_DECORATION
         ));
 
+        context.register(ADD_FALLEN_BAOBABS, new BiomeModifiers.AddFeaturesBiomeModifier(
+                biomes.getOrThrow(ModTags.Biomes.HAS_BAOBAB_GENERATION),
+                HolderSet.direct(placedFeatures.getOrThrow(ModPlacedFeatures.FALLEN_BAOBAB_PLACED_KEY)),
+                GenerationStep.Decoration.VEGETAL_DECORATION
+        ));
+
         HolderSet<Biome> windsweptSavanna = HolderSet.direct(biomes.getOrThrow(Biomes.WINDSWEPT_SAVANNA));
 
         context.register(ADD_WINDSWEPT_YOUNG_BAOBABS, new BiomeModifiers.AddFeaturesBiomeModifier(
@@ -63,6 +71,12 @@ public final class ModBiomeModifiers {
         context.register(ADD_WINDSWEPT_ANCIENT_BAOBABS, new BiomeModifiers.AddFeaturesBiomeModifier(
                 windsweptSavanna,
                 HolderSet.direct(placedFeatures.getOrThrow(ModPlacedFeatures.WINDSWEPT_ANCIENT_BAOBAB_PLACED_KEY)),
+                GenerationStep.Decoration.VEGETAL_DECORATION
+        ));
+
+        context.register(ADD_WINDSWEPT_FALLEN_BAOBABS, new BiomeModifiers.AddFeaturesBiomeModifier(
+                windsweptSavanna,
+                HolderSet.direct(placedFeatures.getOrThrow(ModPlacedFeatures.WINDSWEPT_FALLEN_BAOBAB_PLACED_KEY)),
                 GenerationStep.Decoration.VEGETAL_DECORATION
         ));
     }

@@ -3,11 +3,11 @@
   "category": "misc",
   "ingredients": [
     {
-      "item": "baobabtree:small_baobab_fruit_pod"
+      "item": "baobabtree:medium_baobab_fruit_pod"
     }
   ],
   "result": {
-    "count": 1,
-    "id": "baobabtree:baobab_fruit_piece"
+    "count": 4,
+    "id": "baobabtree:baobab_fruit"
   }
 }

@@ -16,14 +16,12 @@ public class ModItemModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
-        vanillaTextureItem(ModItems.BAOBAB_SIGN.get(), "acacia_sign");
-        vanillaTextureItem(ModItems.BAOBAB_HANGING_SIGN.get(), "acacia_hanging_sign");
-        vanillaTextureItem(ModItems.BAOBAB_BOAT.get(), "acacia_boat");
-        vanillaTextureItem(ModItems.BAOBAB_CHEST_BOAT.get(), "acacia_chest_boat");
-        vanillaTextureItem(ModItems.BAOBAB_FRUIT_PIECE.get(), "melon_slice");
-        vanillaTextureItem(ModItems.DRIED_BAOBAB_PULP.get(), "dried_kelp");
-        vanillaTextureItem(ModItems.BAOBAB_SEEDS.get(), "pumpkin_seeds");
-        vanillaTextureBlockItem(ModBlocks.BAOBAB_SAPLING.get().asItem(), "acacia_sapling");
+        modTextureItem(ModItems.BAOBAB_SIGN.get(), "baobab_sign");
+        modTextureItem(ModItems.BAOBAB_HANGING_SIGN.get(), "baobab_hanging_sign");
+        modTextureItem(ModItems.BAOBAB_BOAT.get(), "baobab_boat");
+        modTextureItem(ModItems.BAOBAB_CHEST_BOAT.get(), "baobab_chest_boat");
+        modTextureItem(ModItems.BAOBAB_FRUIT.get(), "baobab_fruit");
+        modTextureBlockItem(ModBlocks.BAOBAB_SAPLING.get().asItem(), "baobab_sapling");
 
         modTextureItem(ModBlocks.BAOBAB_LITTER.get().asItem(), "baobab_litter");
     }
@@ -48,5 +46,11 @@ public class ModItemModelProvider extends ItemModelProvider {
         String name = item.builtInRegistryHolder().key().location().getPath();
         withExistingParent(name, mcLoc("item/generated"))
                 .texture("layer0", modLoc("item/" + textureName));
+    }
+
+    private void modTextureBlockItem(Item item, String textureName) {
+        String name = item.builtInRegistryHolder().key().location().getPath();
+        withExistingParent(name, mcLoc("item/generated"))
+                .texture("layer0", modLoc("block/" + textureName));
     }
 }

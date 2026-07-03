@@ -23,7 +23,7 @@ public final class BaobabTreeCommands {
     public static void register(RegisterCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
         dispatcher.register(Commands.literal("baobabtree")
-                .requires(source -> source.hasPermission(2))
+                .requires(source -> source.hasPermission(4))
                 .then(Commands.literal("spawn")
                         .then(Commands.literal("young")
                                 .executes(context -> spawnVariant(context, BaobabTreeGenerator.Variant.YOUNG, sourcePos(context)))
@@ -37,6 +37,10 @@ public final class BaobabTreeCommands {
                                 .executes(context -> spawnVariant(context, BaobabTreeGenerator.Variant.ANCIENT, sourcePos(context)))
                                 .then(Commands.argument("pos", BlockPosArgument.blockPos())
                                         .executes(context -> spawnVariant(context, BaobabTreeGenerator.Variant.ANCIENT, BlockPosArgument.getLoadedBlockPos(context, "pos")))))
+                        .then(Commands.literal("fallen")
+                                .executes(context -> spawnVariant(context, BaobabTreeGenerator.Variant.FALLEN, sourcePos(context)))
+                                .then(Commands.argument("pos", BlockPosArgument.blockPos())
+                                        .executes(context -> spawnVariant(context, BaobabTreeGenerator.Variant.FALLEN, BlockPosArgument.getLoadedBlockPos(context, "pos")))))
                         .then(Commands.literal("all")
                                 .executes(context -> spawnAll(context, sourcePos(context), DEFAULT_SPACING))
                                 .then(Commands.argument("pos", BlockPosArgument.blockPos())
@@ -77,14 +81,17 @@ public final class BaobabTreeCommands {
         BlockPos ancientPos = resolveSurfaceOrigin(level, requestedPos.offset(spacing * 2, 0, 0));
         successes += spawnVariantAt(source, level, ancientPos, BaobabTreeGenerator.Variant.ANCIENT) ? 1 : 0;
 
+        BlockPos fallenPos = resolveSurfaceOrigin(level, requestedPos.offset(spacing * 3, 0, 0));
+        successes += spawnVariantAt(source, level, fallenPos, BaobabTreeGenerator.Variant.FALLEN) ? 1 : 0;
+
         if (successes == 0) {
             source.sendFailure(Component.literal("Failed to generate any baobabs near " + formatPos(resolveSurfaceOrigin(level, requestedPos)) + "."));
             return 0;
         }
 
         int finalSuccesses = successes;
-        source.sendSuccess(() -> Component.literal("Generated " + finalSuccesses + "/3 baobab variants. Young at "
-                + formatPos(youngPos) + ", mature at " + formatPos(maturePos) + ", ancient at " + formatPos(ancientPos) + "."), true);
+        source.sendSuccess(() -> Component.literal("Generated " + finalSuccesses + "/4 baobab variants. Young at "
+                + formatPos(youngPos) + ", mature at " + formatPos(maturePos) + ", ancient at " + formatPos(ancientPos) + ", fallen at " + formatPos(fallenPos) + "."), true);
         return successes;
     }
 
@@ -110,6 +117,7 @@ public final class BaobabTreeCommands {
             case YOUNG -> "young";
             case MATURE -> "mature";
             case ANCIENT -> "ancient";
+            case FALLEN -> "fallen";
         };
     }
 

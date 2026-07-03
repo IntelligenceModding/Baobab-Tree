@@ -1,6 +1,6 @@
 {
   "values": {
-    "baobabtree:baobab_fruit_piece": {
+    "baobabtree:baobab_fruit": {
       "chance": 0.65
     },
     "baobabtree:baobab_fruit_pod": {
@@ -14,12 +14,6 @@
     },
     "baobabtree:baobab_sapling": {
       "chance": 0.3
-    },
-    "baobabtree:baobab_seeds": {
-      "chance": 0.3
-    },
-    "baobabtree:dried_baobab_pulp": {
-      "chance": 0.85
     },
     "baobabtree:large_baobab_fruit_pod": {
       "chance": 0.5

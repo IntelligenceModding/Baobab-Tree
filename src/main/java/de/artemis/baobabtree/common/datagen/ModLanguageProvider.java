@@ -37,10 +37,17 @@ public class ModLanguageProvider extends net.neoforged.neoforge.common.data.Lang
         add(ModBlocks.SMALL_BAOBAB_FRUIT_POD.get(), "Small Baobab Fruit Pod");
         add(ModBlocks.MEDIUM_BAOBAB_FRUIT_POD.get(), "Medium Baobab Fruit Pod");
         add(ModBlocks.LARGE_BAOBAB_FRUIT_POD.get(), "Large Baobab Fruit Pod");
-        add(ModItems.BAOBAB_FRUIT_PIECE.get(), "Baobab Fruit Piece");
-        add(ModItems.DRIED_BAOBAB_PULP.get(), "Dried Baobab Pulp");
-        add(ModItems.BAOBAB_SEEDS.get(), "Baobab Seeds");
+        add(ModItems.BAOBAB_FRUIT.get(), "Baobab Fruit");
         add(ModItems.BAOBAB_BOAT.get(), "Baobab Boat");
         add(ModItems.BAOBAB_CHEST_BOAT.get(), "Baobab Chest Boat");
+
+        add("jei.baobabtree.baobab_sapling", "Needs a 2x2 to grow. A grown sapling cluster only creates the young tree, without the natural ground clutter.");
+        add("jei.baobabtree.baobab_fruit", "Can be eaten or planted on the underside of baobab leaves to start a hanging fruit pod.");
+        add("jei.baobabtree.baobab_litter", "Rummage it by hand to clear the whole pile at once. Thicker piles have better loot odds. Pickaxes strip it layer by layer instead.");
+        add("jei.baobabtree.tree_root", "Acts like a climbable root block. Axe harvests it into loose material, while a shovel turns it into dirt and drops hanging roots.");
+        add("jei.baobabtree.baobab_fruit_pod", "Grows under baobab leaves from planted fruit. Right-click a grown pod to harvest the pod itself and leave the base to regrow.");
+        add("jei.baobabtree.small_baobab_fruit_pod", "Harvest with an axe or sword for 2 baobab fruit. Small fallen pods deal the least impact damage.");
+        add("jei.baobabtree.medium_baobab_fruit_pod", "Harvest with an axe or sword for 4 baobab fruit. Medium fallen pods hit harder than small ones.");
+        add("jei.baobabtree.large_baobab_fruit_pod", "Harvest with an axe or sword for 6 baobab fruit. Ripe hanging pods can drop on their own, and large fallen pods hit the hardest.");
     }
 }

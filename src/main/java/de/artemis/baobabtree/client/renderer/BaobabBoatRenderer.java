@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Axis;
+import de.artemis.baobabtree.BaobabTree;
 import net.minecraft.client.model.BoatModel;
 import net.minecraft.client.model.ChestBoatModel;
 import net.minecraft.client.model.ListModel;
@@ -43,9 +44,10 @@ public class BaobabBoatRenderer<T extends Boat> extends EntityRenderer<T> {
     }
 
     private static ResourceLocation getTextureLocation(boolean chestBoat) {
-        return chestBoat
-                ? ResourceLocation.withDefaultNamespace("textures/entity/chest_boat/acacia.png")
-                : ResourceLocation.withDefaultNamespace("textures/entity/boat/acacia.png");
+        return ResourceLocation.fromNamespaceAndPath(
+                BaobabTree.MOD_ID,
+                chestBoat ? "textures/entity/chest_boat/baobab.png" : "textures/entity/boat/baobab.png"
+        );
     }
 
     @Override

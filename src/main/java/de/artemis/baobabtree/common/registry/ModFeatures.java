@@ -20,6 +20,8 @@ public final class ModFeatures {
             FEATURES.register("mature_baobab_feature", () -> new BaobabTreeFeature(NoneFeatureConfiguration.CODEC, BaobabTreeGenerator.Variant.MATURE));
     public static final Supplier<Feature<NoneFeatureConfiguration>> ANCIENT_BAOBAB_FEATURE =
             FEATURES.register("ancient_baobab_feature", () -> new BaobabTreeFeature(NoneFeatureConfiguration.CODEC, BaobabTreeGenerator.Variant.ANCIENT));
+    public static final Supplier<Feature<NoneFeatureConfiguration>> FALLEN_BAOBAB_FEATURE =
+            FEATURES.register("fallen_baobab_feature", () -> new BaobabTreeFeature(NoneFeatureConfiguration.CODEC, BaobabTreeGenerator.Variant.FALLEN));
 
     private ModFeatures() {
     }

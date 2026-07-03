@@ -2,8 +2,7 @@
   "multipart": [
     {
       "apply": {
-        "model": "baobabtree:block/baobab_fruit_pod_base",
-        "uvlock": true
+        "model": "baobabtree:block/baobab_fruit_pod_base"
       },
       "when": {
         "age": "0",
@@ -12,8 +11,7 @@
     },
     {
       "apply": {
-        "model": "baobabtree:block/baobab_fruit_pod_base",
-        "uvlock": true
+        "model": "baobabtree:block/baobab_fruit_pod_base"
       },
       "when": {
         "age": "1",
@@ -22,8 +20,7 @@
     },
     {
       "apply": {
-        "model": "baobabtree:block/baobab_fruit_pod_base",
-        "uvlock": true
+        "model": "baobabtree:block/baobab_fruit_pod_base"
       },
       "when": {
         "age": "2",
@@ -32,8 +29,7 @@
     },
     {
       "apply": {
-        "model": "baobabtree:block/baobab_fruit_pod_base",
-        "uvlock": true
+        "model": "baobabtree:block/baobab_fruit_pod_base"
       },
       "when": {
         "age": "3",
@@ -42,8 +38,7 @@
     },
     {
       "apply": {
-        "model": "baobabtree:block/baobab_fruit_pod_growth_stage1",
-        "uvlock": true
+        "model": "baobabtree:block/baobab_fruit_pod_growth_stage1"
       },
       "when": {
         "age": "1",
@@ -52,8 +47,7 @@
     },
     {
       "apply": {
-        "model": "baobabtree:block/baobab_fruit_pod_growth_stage2",
-        "uvlock": true
+        "model": "baobabtree:block/baobab_fruit_pod_growth_stage2"
       },
       "when": {
         "age": "2",
@@ -62,8 +56,7 @@
     },
     {
       "apply": {
-        "model": "baobabtree:block/baobab_fruit_pod_growth_stage3",
-        "uvlock": true
+        "model": "baobabtree:block/baobab_fruit_pod_growth_stage3"
       },
       "when": {
         "age": "3",
@@ -73,7 +66,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_base",
-        "uvlock": true,
         "y": 90
       },
       "when": {
@@ -84,7 +76,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_base",
-        "uvlock": true,
         "y": 90
       },
       "when": {
@@ -95,7 +86,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_base",
-        "uvlock": true,
         "y": 90
       },
       "when": {
@@ -106,7 +96,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_base",
-        "uvlock": true,
         "y": 90
       },
       "when": {
@@ -117,7 +106,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_growth_stage1",
-        "uvlock": true,
         "y": 90
       },
       "when": {
@@ -128,7 +116,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_growth_stage2",
-        "uvlock": true,
         "y": 90
       },
       "when": {
@@ -139,7 +126,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_growth_stage3",
-        "uvlock": true,
         "y": 90
       },
       "when": {
@@ -150,7 +136,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_base",
-        "uvlock": true,
         "y": 180
       },
       "when": {
@@ -161,7 +146,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_base",
-        "uvlock": true,
         "y": 180
       },
       "when": {
@@ -172,7 +156,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_base",
-        "uvlock": true,
         "y": 180
       },
       "when": {
@@ -183,7 +166,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_base",
-        "uvlock": true,
         "y": 180
       },
       "when": {
@@ -194,7 +176,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_growth_stage1",
-        "uvlock": true,
         "y": 180
       },
       "when": {
@@ -205,7 +186,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_growth_stage2",
-        "uvlock": true,
         "y": 180
       },
       "when": {
@@ -216,7 +196,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_growth_stage3",
-        "uvlock": true,
         "y": 180
       },
       "when": {
@@ -227,7 +206,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_base",
-        "uvlock": true,
         "y": 270
       },
       "when": {
@@ -238,7 +216,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_base",
-        "uvlock": true,
         "y": 270
       },
       "when": {
@@ -249,7 +226,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_base",
-        "uvlock": true,
         "y": 270
       },
       "when": {
@@ -260,7 +236,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_base",
-        "uvlock": true,
         "y": 270
       },
       "when": {
@@ -271,7 +246,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_growth_stage1",
-        "uvlock": true,
         "y": 270
       },
       "when": {
@@ -282,7 +256,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_growth_stage2",
-        "uvlock": true,
         "y": 270
       },
       "when": {
@@ -293,7 +266,6 @@
     {
       "apply": {
         "model": "baobabtree:block/baobab_fruit_pod_growth_stage3",
-        "uvlock": true,
         "y": 270
       },
       "when": {

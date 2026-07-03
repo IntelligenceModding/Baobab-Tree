@@ -16,8 +16,8 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
-public class BaobabSeedsItem extends Item {
-    public BaobabSeedsItem(Properties properties) {
+public class BaobabFruitItem extends Item {
+    public BaobabFruitItem(Properties properties) {
         super(properties);
     }
 

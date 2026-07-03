@@ -32,11 +32,16 @@ import org.jetbrains.annotations.Nullable;
 
 public class BaobabLitterBlock extends PinkPetalsBlock implements EntityBlock {
     public static final MapCodec<BaobabLitterBlock> CODEC = simpleCodec(BaobabLitterBlock::new);
-    public static final BooleanProperty HAS_FRUIT = BooleanProperty.create("has_fruit");
+    public static final BooleanProperty HAS_SMALL = BooleanProperty.create("has_small");
+    public static final BooleanProperty HAS_MEDIUM = BooleanProperty.create("has_medium");
+    public static final BooleanProperty HAS_LARGE = BooleanProperty.create("has_large");
 
     public BaobabLitterBlock(Properties properties) {
         super(properties);
-        registerDefaultState(defaultBlockState().setValue(HAS_FRUIT, false));
+        registerDefaultState(defaultBlockState()
+                .setValue(HAS_SMALL, false)
+                .setValue(HAS_MEDIUM, false)
+                .setValue(HAS_LARGE, false));
     }
 
     @Override
@@ -48,7 +53,7 @@ public class BaobabLitterBlock extends PinkPetalsBlock implements EntityBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(HAS_FRUIT);
+        builder.add(HAS_SMALL, HAS_MEDIUM, HAS_LARGE);
     }
 
     @Override
@@ -61,6 +66,17 @@ public class BaobabLitterBlock extends PinkPetalsBlock implements EntityBlock {
         return !useContext.isSecondaryUseActive()
                 && useContext.getItemInHand().is(this.asItem())
                 && state.getValue(AMOUNT) < 4;
+    }
+
+    @Override
+    public @Nullable BlockState getStateForPlacement(@NotNull BlockPlaceContext context) {
+        BlockState existing = context.getLevel().getBlockState(context.getClickedPos());
+        if (existing.is(this)) {
+            return existing.setValue(AMOUNT, Math.min(4, existing.getValue(AMOUNT) + 1));
+        }
+
+        BlockState state = super.getStateForPlacement(context);
+        return state == null ? null : clearPodState(state);
     }
 
     @Override
@@ -121,8 +137,9 @@ public class BaobabLitterBlock extends PinkPetalsBlock implements EntityBlock {
 
     private void rummage(ServerLevel level, BlockPos pos, BlockState state, Player player, int amountBefore) {
         RandomSource random = level.random;
-        if (state.getValue(HAS_FRUIT)) {
-            giveToPlayerOrDrop(level, pos, player, new ItemStack(ModItems.BAOBAB_FRUIT_PIECE.get()));
+        Block podBlock = podBlockForState(state);
+        if (podBlock != null) {
+            giveToPlayerOrDrop(level, pos, player, new ItemStack(podBlock));
         }
         float successChance = Math.min(0.8F, amountBefore * 0.2F);
         if (random.nextFloat() < successChance) {
@@ -139,10 +156,10 @@ public class BaobabLitterBlock extends PinkPetalsBlock implements EntityBlock {
             return new ItemStack(net.minecraft.world.item.Items.STICK, 1 + random.nextInt(2));
         }
         if (roll < 72) {
-            return new ItemStack(ModItems.BAOBAB_SEEDS.get(), 1);
+            return new ItemStack(ModItems.BAOBAB_FRUIT.get(), 1);
         }
         if (roll < 87) {
-            return new ItemStack(ModItems.BAOBAB_FRUIT_PIECE.get(), 1);
+            return new ItemStack(ModItems.BAOBAB_FRUIT.get(), 2);
         }
         if (roll < 96) {
             return new ItemStack(ModBlocks.BAOBAB_SAPLING.get(), 1);
@@ -153,17 +170,40 @@ public class BaobabLitterBlock extends PinkPetalsBlock implements EntityBlock {
     private void harvestOneLayer(Level level, BlockPos pos, BlockState state) {
         int amountBefore = state.getValue(AMOUNT);
         Block.popResource(level, pos, new ItemStack(ModBlocks.BAOBAB_LITTER.get()));
-        boolean hadFruit = state.getValue(HAS_FRUIT);
+        Block podBlock = podBlockForState(state);
 
         if (amountBefore <= 1) {
             level.removeBlock(pos, false);
         } else {
-            level.setBlock(pos, state.setValue(AMOUNT, amountBefore - 1).setValue(HAS_FRUIT, false), 2);
+            level.setBlock(pos, clearPodState(state).setValue(AMOUNT, amountBefore - 1), 2);
         }
 
-        if (hadFruit) {
-            Block.popResource(level, pos, new ItemStack(ModItems.BAOBAB_FRUIT_PIECE.get()));
+        if (podBlock != null) {
+            Block.popResource(level, pos, new ItemStack(podBlock));
         }
+    }
+
+    public static BlockState clearPodState(BlockState state) {
+        return state.setValue(HAS_SMALL, false)
+                .setValue(HAS_MEDIUM, false)
+                .setValue(HAS_LARGE, false);
+    }
+
+    public static boolean hasAnyPod(BlockState state) {
+        return state.getValue(HAS_SMALL) || state.getValue(HAS_MEDIUM) || state.getValue(HAS_LARGE);
+    }
+
+    public static Block podBlockForState(BlockState state) {
+        if (state.getValue(HAS_LARGE)) {
+            return ModBlocks.LARGE_BAOBAB_FRUIT_POD.get();
+        }
+        if (state.getValue(HAS_MEDIUM)) {
+            return ModBlocks.MEDIUM_BAOBAB_FRUIT_POD.get();
+        }
+        if (state.getValue(HAS_SMALL)) {
+            return ModBlocks.SMALL_BAOBAB_FRUIT_POD.get();
+        }
+        return null;
     }
 
     private void giveToPlayerOrDrop(Level level, BlockPos pos, Player player, ItemStack stack) {

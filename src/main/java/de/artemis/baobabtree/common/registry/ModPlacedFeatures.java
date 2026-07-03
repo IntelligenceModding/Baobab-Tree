@@ -20,9 +20,11 @@ public final class ModPlacedFeatures {
     public static final ResourceKey<PlacedFeature> YOUNG_BAOBAB_PLACED_KEY = registerKey("young_baobab_placed");
     public static final ResourceKey<PlacedFeature> MATURE_BAOBAB_PLACED_KEY = registerKey("mature_baobab_placed");
     public static final ResourceKey<PlacedFeature> ANCIENT_BAOBAB_PLACED_KEY = registerKey("ancient_baobab_placed");
+    public static final ResourceKey<PlacedFeature> FALLEN_BAOBAB_PLACED_KEY = registerKey("fallen_baobab_placed");
     public static final ResourceKey<PlacedFeature> WINDSWEPT_YOUNG_BAOBAB_PLACED_KEY = registerKey("windswept_young_baobab_placed");
     public static final ResourceKey<PlacedFeature> WINDSWEPT_MATURE_BAOBAB_PLACED_KEY = registerKey("windswept_mature_baobab_placed");
     public static final ResourceKey<PlacedFeature> WINDSWEPT_ANCIENT_BAOBAB_PLACED_KEY = registerKey("windswept_ancient_baobab_placed");
+    public static final ResourceKey<PlacedFeature> WINDSWEPT_FALLEN_BAOBAB_PLACED_KEY = registerKey("windswept_fallen_baobab_placed");
 
     private ModPlacedFeatures() {
     }
@@ -54,6 +56,14 @@ public final class ModPlacedFeatures {
                         BiomeFilter.biome()
                 ));
 
+        register(context, FALLEN_BAOBAB_PLACED_KEY, configuredFeatures.getOrThrow(ModTreeConfiguredFeatures.FALLEN_BAOBAB_KEY),
+                List.of(
+                        RarityFilter.onAverageOnceEvery(220),
+                        InSquarePlacement.spread(),
+                        HeightmapPlacement.onHeightmap(Heightmap.Types.OCEAN_FLOOR_WG),
+                        BiomeFilter.biome()
+                ));
+
         register(context, WINDSWEPT_YOUNG_BAOBAB_PLACED_KEY, configuredFeatures.getOrThrow(ModTreeConfiguredFeatures.YOUNG_BAOBAB_KEY),
                 List.of(
                         RarityFilter.onAverageOnceEvery(60),
@@ -73,6 +83,14 @@ public final class ModPlacedFeatures {
         register(context, WINDSWEPT_ANCIENT_BAOBAB_PLACED_KEY, configuredFeatures.getOrThrow(ModTreeConfiguredFeatures.ANCIENT_BAOBAB_KEY),
                 List.of(
                         RarityFilter.onAverageOnceEvery(400),
+                        InSquarePlacement.spread(),
+                        HeightmapPlacement.onHeightmap(Heightmap.Types.OCEAN_FLOOR_WG),
+                        BiomeFilter.biome()
+                ));
+
+        register(context, WINDSWEPT_FALLEN_BAOBAB_PLACED_KEY, configuredFeatures.getOrThrow(ModTreeConfiguredFeatures.FALLEN_BAOBAB_KEY),
+                List.of(
+                        RarityFilter.onAverageOnceEvery(350),
                         InSquarePlacement.spread(),
                         HeightmapPlacement.onHeightmap(Heightmap.Types.OCEAN_FLOOR_WG),
                         BiomeFilter.biome()

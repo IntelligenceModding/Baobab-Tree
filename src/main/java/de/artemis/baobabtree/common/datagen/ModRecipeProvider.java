@@ -11,12 +11,9 @@ import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.ShapelessRecipeBuilder;
-import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
 
@@ -72,9 +69,9 @@ public class ModRecipeProvider extends RecipeProvider {
                 .save(recipeOutput);
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.DECORATIONS, ModBlocks.BAOBAB_SAPLING.get())
-                .requires(ModItems.BAOBAB_SEEDS.get(), 4)
-                .unlockedBy(getHasName(ModItems.BAOBAB_SEEDS.get()), has(ModItems.BAOBAB_SEEDS.get()))
-                .save(recipeOutput, ResourceLocation.fromNamespaceAndPath(BaobabTree.MOD_ID, "baobab_sapling_from_seeds"));
+                .requires(ModItems.BAOBAB_FRUIT.get(), 4)
+                .unlockedBy(getHasName(ModItems.BAOBAB_FRUIT.get()), has(ModItems.BAOBAB_FRUIT.get()))
+                .save(recipeOutput, ResourceLocation.fromNamespaceAndPath(BaobabTree.MOD_ID, "baobab_sapling_from_fruit"));
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.DECORATIONS, ModBlocks.BAOBAB_LITTER.get(), 2)
                 .requires(ModBlocks.BAOBAB_LEAVES.get())
@@ -92,41 +89,19 @@ public class ModRecipeProvider extends RecipeProvider {
                 .unlockedBy(getHasName(ModBlocks.TREE_ROOT.get()), has(ModBlocks.TREE_ROOT.get()))
                 .save(recipeOutput, ResourceLocation.fromNamespaceAndPath(BaobabTree.MOD_ID, "hanging_roots_from_tree_root"));
 
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, ModItems.BAOBAB_FRUIT_PIECE.get(), 1)
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, ModItems.BAOBAB_FRUIT.get(), 2)
                 .requires(ModBlocks.SMALL_BAOBAB_FRUIT_POD.get())
                 .unlockedBy(getHasName(ModBlocks.SMALL_BAOBAB_FRUIT_POD.get()), has(ModBlocks.SMALL_BAOBAB_FRUIT_POD.get()))
-                .save(recipeOutput, ResourceLocation.fromNamespaceAndPath(BaobabTree.MOD_ID, "baobab_fruit_piece_from_small_pod"));
+                .save(recipeOutput, ResourceLocation.fromNamespaceAndPath(BaobabTree.MOD_ID, "baobab_fruit_from_small_pod"));
 
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, ModItems.BAOBAB_FRUIT_PIECE.get(), 2)
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, ModItems.BAOBAB_FRUIT.get(), 4)
                 .requires(ModBlocks.MEDIUM_BAOBAB_FRUIT_POD.get())
                 .unlockedBy(getHasName(ModBlocks.MEDIUM_BAOBAB_FRUIT_POD.get()), has(ModBlocks.MEDIUM_BAOBAB_FRUIT_POD.get()))
-                .save(recipeOutput, ResourceLocation.fromNamespaceAndPath(BaobabTree.MOD_ID, "baobab_fruit_piece_from_medium_pod"));
+                .save(recipeOutput, ResourceLocation.fromNamespaceAndPath(BaobabTree.MOD_ID, "baobab_fruit_from_medium_pod"));
 
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, ModItems.BAOBAB_FRUIT_PIECE.get(), 3)
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.FOOD, ModItems.BAOBAB_FRUIT.get(), 6)
                 .requires(ModBlocks.LARGE_BAOBAB_FRUIT_POD.get())
                 .unlockedBy(getHasName(ModBlocks.LARGE_BAOBAB_FRUIT_POD.get()), has(ModBlocks.LARGE_BAOBAB_FRUIT_POD.get()))
-                .save(recipeOutput, ResourceLocation.fromNamespaceAndPath(BaobabTree.MOD_ID, "baobab_fruit_piece_from_large_pod"));
-
-        foodSmelting(recipeOutput, ModItems.BAOBAB_FRUIT_PIECE.get(), ModItems.DRIED_BAOBAB_PULP.get(), 0.1F, 200);
-        foodSmoking(recipeOutput, ModItems.BAOBAB_FRUIT_PIECE.get(), ModItems.DRIED_BAOBAB_PULP.get(), 0.1F, 100);
-        foodCampfireCooking(recipeOutput, ModItems.BAOBAB_FRUIT_PIECE.get(), ModItems.DRIED_BAOBAB_PULP.get(), 0.1F, 600);
-    }
-
-    private static void foodSmelting(RecipeOutput recipeOutput, ItemLike input, ItemLike output, float exp, int time) {
-        SimpleCookingRecipeBuilder.smelting(Ingredient.of(input), RecipeCategory.FOOD, output, exp, time)
-                .unlockedBy(getHasName(input), has(input))
-                .save(recipeOutput, BaobabTree.MOD_ID + ":" + getItemName(output) + "_from_smelting");
-    }
-
-    private static void foodSmoking(RecipeOutput recipeOutput, ItemLike input, ItemLike output, float exp, int time) {
-        SimpleCookingRecipeBuilder.smoking(Ingredient.of(input), RecipeCategory.FOOD, output, exp, time)
-                .unlockedBy(getHasName(input), has(input))
-                .save(recipeOutput, BaobabTree.MOD_ID + ":" + getItemName(output) + "_from_smoking");
-    }
-
-    private static void foodCampfireCooking(RecipeOutput recipeOutput, ItemLike input, ItemLike output, float exp, int time) {
-        SimpleCookingRecipeBuilder.generic(Ingredient.of(input), RecipeCategory.FOOD, output, exp, time, RecipeSerializer.CAMPFIRE_COOKING_RECIPE, net.minecraft.world.item.crafting.CampfireCookingRecipe::new)
-                .unlockedBy(getHasName(input), has(input))
-                .save(recipeOutput, BaobabTree.MOD_ID + ":" + getItemName(output) + "_from_campfire_cooking");
+                .save(recipeOutput, ResourceLocation.fromNamespaceAndPath(BaobabTree.MOD_ID, "baobab_fruit_from_large_pod"));
     }
 }

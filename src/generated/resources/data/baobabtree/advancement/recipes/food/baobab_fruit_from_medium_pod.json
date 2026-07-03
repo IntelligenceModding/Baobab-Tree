@@ -1,11 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_baobab_fruit_piece": {
+    "has_medium_baobab_fruit_pod": {
       "conditions": {
         "items": [
           {
-            "items": "baobabtree:baobab_fruit_piece"
+            "items": "baobabtree:medium_baobab_fruit_pod"
           }
         ]
       },
@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "baobabtree:dried_baobab_pulp_from_smoking"
+        "recipe": "baobabtree:baobab_fruit_from_medium_pod"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -21,12 +21,12 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_baobab_fruit_piece"
+      "has_medium_baobab_fruit_pod"
     ]
   ],
   "rewards": {
     "recipes": [
-      "baobabtree:dried_baobab_pulp_from_smoking"
+      "baobabtree:baobab_fruit_from_medium_pod"
     ]
   }
 }
