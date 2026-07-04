@@ -2,6 +2,7 @@ package de.artemis.baobabtree;
 
 import de.artemis.baobabtree.common.command.BaobabTreeCommands;
 import de.artemis.baobabtree.common.datagen.DataGenerators;
+import de.artemis.baobabtree.common.event.ModVillagerTradeHandler;
 import de.artemis.baobabtree.common.event.TreeRootClimbHandler;
 import de.artemis.baobabtree.common.registry.ModBlockEntities;
 import de.artemis.baobabtree.common.registry.ModBlocks;
@@ -29,5 +30,7 @@ public class BaobabTree {
         modEventBus.addListener(DataGenerators::gatherData);
         NeoForge.EVENT_BUS.addListener(BaobabTreeCommands::register);
         NeoForge.EVENT_BUS.addListener(TreeRootClimbHandler::onPlayerTick);
+        NeoForge.EVENT_BUS.addListener(ModVillagerTradeHandler::onWandererTrades);
+        NeoForge.EVENT_BUS.addListener(ModVillagerTradeHandler::onVillagerTrades);
     }
 }

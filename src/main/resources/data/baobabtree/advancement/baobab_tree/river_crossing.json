@@ -1,0 +1,29 @@
+{
+  "parent": "baobabtree:baobab_tree/savanna_joinery",
+  "display": {
+    "description": {
+      "translate": "advancements.baobabtree.river_crossing.description"
+    },
+    "frame": "task",
+    "icon": {
+      "id": "baobabtree:baobab_boat"
+    },
+    "title": {
+      "translate": "advancements.baobabtree.river_crossing.title"
+    },
+    "x": 8,
+    "y": 1
+  },
+  "criteria": {
+    "has_baobab_boat": {
+      "conditions": {
+        "items": [
+          {
+            "items": "baobabtree:baobab_boat"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  }
+}

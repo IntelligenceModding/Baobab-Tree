@@ -23,7 +23,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         modTextureItem(ModItems.BAOBAB_FRUIT.get(), "baobab_fruit");
         modTextureBlockItem(ModBlocks.BAOBAB_SAPLING.get().asItem(), "baobab_sapling");
 
-        modTextureItem(ModBlocks.BAOBAB_LITTER.get().asItem(), "baobab_litter");
+        modTextureBlockItem(ModBlocks.BAOBAB_LITTER.get().asItem(), "baobab_litter");
     }
 
     private void vanillaTextureItem(Item item, String textureName) {

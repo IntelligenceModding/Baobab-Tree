@@ -6,6 +6,7 @@ import de.artemis.baobabtree.common.registry.ModTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;
+import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.NotNull;
@@ -54,6 +55,21 @@ public class ModBlockTagProvider extends BlockTagsProvider {
         tag(BlockTags.LEAVES)
                 .add(ModBlocks.BAOBAB_LEAVES.get());
 
+        tag(BlockTags.FLOWER_POTS)
+                .add(ModBlocks.POTTED_BAOBAB_SAPLING.get());
+
+        tag(BlockTags.CLIMBABLE)
+                .add(ModBlocks.TREE_ROOT.get());
+
+        tag(BlockTags.REPLACEABLE_BY_TREES)
+                .add(ModBlocks.BAOBAB_LITTER.get());
+
+        tag(BlockTags.LOGS)
+                .add(ModBlocks.BAOBAB_LOG.get())
+                .add(ModBlocks.BAOBAB_WOOD.get())
+                .add(ModBlocks.STRIPPED_BAOBAB_LOG.get())
+                .add(ModBlocks.STRIPPED_BAOBAB_WOOD.get());
+
         tag(BlockTags.LOGS_THAT_BURN)
                 .add(ModBlocks.BAOBAB_LOG.get())
                 .add(ModBlocks.BAOBAB_WOOD.get())
@@ -64,6 +80,15 @@ public class ModBlockTagProvider extends BlockTagsProvider {
                 .add(ModBlocks.BAOBAB_LOG.get())
                 .add(ModBlocks.BAOBAB_WOOD.get())
                 .add(ModBlocks.STRIPPED_BAOBAB_LOG.get())
+                .add(ModBlocks.STRIPPED_BAOBAB_WOOD.get());
+
+        tag(Tags.Blocks.FENCE_GATES_WOODEN)
+                .add(ModBlocks.BAOBAB_FENCE_GATE.get());
+
+        tag(Tags.Blocks.STRIPPED_LOGS)
+                .add(ModBlocks.STRIPPED_BAOBAB_LOG.get());
+
+        tag(Tags.Blocks.STRIPPED_WOODS)
                 .add(ModBlocks.STRIPPED_BAOBAB_WOOD.get());
 
         tag(BlockTags.PLANKS)

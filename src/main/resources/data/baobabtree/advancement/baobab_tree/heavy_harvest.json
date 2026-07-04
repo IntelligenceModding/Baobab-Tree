@@ -1,0 +1,32 @@
+{
+  "parent": "baobabtree:baobab_tree/fallen_orchard",
+  "display": {
+    "description": {
+      "translate": "advancements.baobabtree.heavy_harvest.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "id": "baobabtree:large_baobab_fruit_pod"
+    },
+    "title": {
+      "translate": "advancements.baobabtree.heavy_harvest.title"
+    },
+    "x": 6,
+    "y": 4
+  },
+  "criteria": {
+    "has_large_pod": {
+      "conditions": {
+        "items": [
+          {
+            "items": "baobabtree:large_baobab_fruit_pod"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "rewards": {
+    "experience": 15
+  }
+}

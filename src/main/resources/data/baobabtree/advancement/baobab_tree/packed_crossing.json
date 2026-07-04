@@ -1,0 +1,32 @@
+{
+  "parent": "baobabtree:baobab_tree/river_crossing",
+  "display": {
+    "description": {
+      "translate": "advancements.baobabtree.packed_crossing.description"
+    },
+    "frame": "goal",
+    "icon": {
+      "id": "baobabtree:baobab_chest_boat"
+    },
+    "title": {
+      "translate": "advancements.baobabtree.packed_crossing.title"
+    },
+    "x": 10,
+    "y": 1
+  },
+  "criteria": {
+    "has_baobab_chest_boat": {
+      "conditions": {
+        "items": [
+          {
+            "items": "baobabtree:baobab_chest_boat"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "rewards": {
+    "experience": 15
+  }
+}

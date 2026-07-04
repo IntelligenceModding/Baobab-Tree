@@ -1,0 +1,29 @@
+{
+  "parent": "baobabtree:baobab_tree/root",
+  "display": {
+    "description": {
+      "translate": "advancements.baobabtree.plant_the_future.description"
+    },
+    "frame": "task",
+    "icon": {
+      "id": "baobabtree:baobab_sapling"
+    },
+    "title": {
+      "translate": "advancements.baobabtree.plant_the_future.title"
+    },
+    "x": 2,
+    "y": 0
+  },
+  "criteria": {
+    "has_baobab_sapling": {
+      "conditions": {
+        "items": [
+          {
+            "items": "baobabtree:baobab_sapling"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  }
+}

@@ -45,15 +45,15 @@ public final class ClientModEvents {
 
     public static void registerBlockColors(RegisterColorHandlersEvent.Block event) {
         event.register((state, level, pos, tintIndex) ->
-                        level != null && pos != null
+                        tintIndex == 0 && level != null && pos != null
                                 ? BiomeColors.getAverageFoliageColor(level, pos)
-                                : FoliageColor.getDefaultColor(),
+                                : tintIndex == 0 ? FoliageColor.getDefaultColor() : -1,
                 ModBlocks.BAOBAB_LEAVES.get(),
                 ModBlocks.BAOBAB_LITTER.get());
     }
 
     public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
-        event.register((stack, tintIndex) -> FoliageColor.getDefaultColor(),
+        event.register((stack, tintIndex) -> tintIndex == 0 ? FoliageColor.getDefaultColor() : -1,
                 ModBlocks.BAOBAB_LEAVES.get(),
                 ModBlocks.BAOBAB_LITTER.get());
     }

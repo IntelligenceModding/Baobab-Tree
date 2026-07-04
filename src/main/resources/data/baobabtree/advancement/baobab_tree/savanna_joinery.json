@@ -1,0 +1,29 @@
+{
+  "parent": "baobabtree:baobab_tree/baobab_timber",
+  "display": {
+    "description": {
+      "translate": "advancements.baobabtree.savanna_joinery.description"
+    },
+    "frame": "task",
+    "icon": {
+      "id": "baobabtree:baobab_planks"
+    },
+    "title": {
+      "translate": "advancements.baobabtree.savanna_joinery.title"
+    },
+    "x": 6,
+    "y": 0
+  },
+  "criteria": {
+    "has_baobab_planks": {
+      "conditions": {
+        "items": [
+          {
+            "items": "baobabtree:baobab_planks"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  }
+}

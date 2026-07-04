@@ -1,0 +1,27 @@
+{
+  "parent": "baobabtree:baobab_tree/root",
+  "display": {
+    "description": {
+      "translate": "advancements.baobabtree.taste_of_the_savanna.description"
+    },
+    "frame": "task",
+    "icon": {
+      "id": "baobabtree:baobab_fruit"
+    },
+    "title": {
+      "translate": "advancements.baobabtree.taste_of_the_savanna.title"
+    },
+    "x": 2,
+    "y": -2
+  },
+  "criteria": {
+    "eat_baobab_fruit": {
+      "conditions": {
+        "item": {
+          "items": "baobabtree:baobab_fruit"
+        }
+      },
+      "trigger": "minecraft:consume_item"
+    }
+  }
+}
