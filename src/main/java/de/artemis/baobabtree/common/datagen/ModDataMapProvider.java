@@ -45,6 +45,7 @@ public class ModDataMapProvider extends DataMapProvider {
                 .add(ModBlocks.BAOBAB_FENCE_GATE.getId(), new FurnaceFuel(300), false)
                 .add(ModBlocks.BAOBAB_DOOR.getId(), new FurnaceFuel(200), false)
                 .add(ModBlocks.BAOBAB_TRAPDOOR.getId(), new FurnaceFuel(300), false)
+                .add(ModBlocks.BAOBAB_SHELF.getId(), new FurnaceFuel(300), false)
                 .add(ModBlocks.BAOBAB_BUTTON.getId(), new FurnaceFuel(100), false)
                 .add(ModBlocks.BAOBAB_PRESSURE_PLATE.getId(), new FurnaceFuel(300), false)
                 .add(ModBlocks.BAOBAB_LITTER.getId(), new FurnaceFuel(100), false)

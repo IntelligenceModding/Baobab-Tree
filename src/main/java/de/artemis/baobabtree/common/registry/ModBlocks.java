@@ -11,8 +11,6 @@ import de.artemis.baobabtree.common.block.BaobabStrippableLogBlock;
 import de.artemis.baobabtree.common.block.BaobabWallHangingSignBlock;
 import de.artemis.baobabtree.common.block.BaobabWallSignBlock;
 import de.artemis.baobabtree.common.block.TreeRootBlock;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.DoorBlock;
@@ -20,12 +18,13 @@ import net.minecraft.world.level.block.FenceBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
 import net.minecraft.world.level.block.FlowerPotBlock;
 import net.minecraft.world.level.block.LeavesBlock;
-import net.minecraft.world.level.block.PinkPetalsBlock;
 import net.minecraft.world.level.block.PressurePlateBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.ShelfBlock;
 import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.TintedParticleLeavesBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -33,6 +32,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings("deprecation")
@@ -40,90 +40,124 @@ public final class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(BaobabTree.MOD_ID);
 
     public static final DeferredBlock<Block> BAOBAB_LOG = registerBlock("baobab_log",
-            () -> new BaobabStrippableLogBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_LOG), () -> ModBlocks.STRIPPED_BAOBAB_LOG.get()));
+            properties -> new BaobabStrippableLogBlock(properties, () -> ModBlocks.STRIPPED_BAOBAB_LOG.get()),
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.ACACIA_LOG));
 
     public static final DeferredBlock<Block> BAOBAB_WOOD = registerBlock("baobab_wood",
-            () -> new BaobabStrippableLogBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_WOOD), () -> ModBlocks.STRIPPED_BAOBAB_WOOD.get()));
+            properties -> new BaobabStrippableLogBlock(properties, () -> ModBlocks.STRIPPED_BAOBAB_WOOD.get()),
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.ACACIA_WOOD));
 
     public static final DeferredBlock<Block> STRIPPED_BAOBAB_LOG = registerBlock("stripped_baobab_log",
-            () -> new RotatedPillarBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_ACACIA_LOG)));
+            RotatedPillarBlock::new,
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.STRIPPED_ACACIA_LOG));
 
     public static final DeferredBlock<Block> STRIPPED_BAOBAB_WOOD = registerBlock("stripped_baobab_wood",
-            () -> new RotatedPillarBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STRIPPED_ACACIA_WOOD)));
+            RotatedPillarBlock::new,
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.STRIPPED_ACACIA_WOOD));
 
     public static final DeferredBlock<Block> BAOBAB_PLANKS = registerBlock("baobab_planks",
-            () -> new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_PLANKS)));
+            Block::new,
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.ACACIA_PLANKS));
 
     public static final DeferredBlock<Block> BAOBAB_STAIRS = registerBlock("baobab_stairs",
-            () -> new StairBlock(BAOBAB_PLANKS.get().defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_STAIRS)));
+            properties -> new StairBlock(BAOBAB_PLANKS.get().defaultBlockState(), properties),
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.ACACIA_STAIRS));
 
     public static final DeferredBlock<Block> BAOBAB_SLAB = registerBlock("baobab_slab",
-            () -> new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_SLAB)));
+            SlabBlock::new,
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.ACACIA_SLAB));
 
     public static final DeferredBlock<Block> BAOBAB_FENCE = registerBlock("baobab_fence",
-            () -> new FenceBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_FENCE)));
+            FenceBlock::new,
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.ACACIA_FENCE));
 
     public static final DeferredBlock<Block> BAOBAB_FENCE_GATE = registerBlock("baobab_fence_gate",
-            () -> new FenceGateBlock(ModWoodTypes.BAOBAB_WOOD_TYPE, BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_FENCE_GATE)));
+            properties -> new FenceGateBlock(ModWoodTypes.BAOBAB_WOOD_TYPE, properties),
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.ACACIA_FENCE_GATE));
 
     public static final DeferredBlock<Block> BAOBAB_BUTTON = registerBlock("baobab_button",
-            () -> new ButtonBlock(ModWoodTypes.BAOBAB_SET_TYPE, 30, BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_BUTTON).noCollission()));
+            properties -> new ButtonBlock(ModWoodTypes.BAOBAB_SET_TYPE, 30, properties.noCollision()),
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.ACACIA_BUTTON));
 
     public static final DeferredBlock<Block> BAOBAB_PRESSURE_PLATE = registerBlock("baobab_pressure_plate",
-            () -> new PressurePlateBlock(ModWoodTypes.BAOBAB_SET_TYPE, BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_PRESSURE_PLATE)));
+            properties -> new PressurePlateBlock(ModWoodTypes.BAOBAB_SET_TYPE, properties),
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.ACACIA_PRESSURE_PLATE));
 
     public static final DeferredBlock<Block> BAOBAB_DOOR = registerBlock("baobab_door",
-            () -> new DoorBlock(ModWoodTypes.BAOBAB_SET_TYPE, BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_DOOR).noOcclusion()));
+            properties -> new DoorBlock(ModWoodTypes.BAOBAB_SET_TYPE, properties.noOcclusion()),
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.ACACIA_DOOR));
 
     public static final DeferredBlock<Block> BAOBAB_TRAPDOOR = registerBlock("baobab_trapdoor",
-            () -> new TrapDoorBlock(ModWoodTypes.BAOBAB_SET_TYPE, BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_TRAPDOOR).noOcclusion()));
+            properties -> new TrapDoorBlock(ModWoodTypes.BAOBAB_SET_TYPE, properties.noOcclusion()),
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.ACACIA_TRAPDOOR));
 
-    public static final DeferredBlock<Block> BAOBAB_SIGN = BLOCKS.register("baobab_sign",
-            () -> new BaobabStandingSignBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_SIGN).noCollission().strength(1.0F)));
+    public static final DeferredBlock<Block> BAOBAB_SHELF = registerBlock("baobab_shelf",
+            ShelfBlock::new,
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.ACACIA_SHELF));
 
-    public static final DeferredBlock<Block> BAOBAB_WALL_SIGN = BLOCKS.register("baobab_wall_sign",
-            () -> new BaobabWallSignBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_WALL_SIGN).noCollission().strength(1.0F).lootFrom(BAOBAB_SIGN)));
+    public static final DeferredBlock<Block> BAOBAB_SIGN = registerBlockWithoutItem("baobab_sign",
+            properties -> new BaobabStandingSignBlock(properties.noCollision().strength(1.0F)),
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.ACACIA_SIGN));
 
-    public static final DeferredBlock<Block> BAOBAB_HANGING_SIGN = BLOCKS.register("baobab_hanging_sign",
-            () -> new BaobabCeilingHangingSignBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_HANGING_SIGN).noCollission().strength(1.0F)));
+    public static final DeferredBlock<Block> BAOBAB_WALL_SIGN = registerBlockWithoutItem("baobab_wall_sign",
+            properties -> new BaobabWallSignBlock(properties.noCollision().strength(1.0F)),
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.ACACIA_WALL_SIGN));
 
-    public static final DeferredBlock<Block> BAOBAB_WALL_HANGING_SIGN = BLOCKS.register("baobab_wall_hanging_sign",
-            () -> new BaobabWallHangingSignBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_WALL_HANGING_SIGN).noCollission().strength(1.0F).lootFrom(BAOBAB_HANGING_SIGN)));
+    public static final DeferredBlock<Block> BAOBAB_HANGING_SIGN = registerBlockWithoutItem("baobab_hanging_sign",
+            properties -> new BaobabCeilingHangingSignBlock(properties.noCollision().strength(1.0F)),
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.ACACIA_HANGING_SIGN));
+
+    public static final DeferredBlock<Block> BAOBAB_WALL_HANGING_SIGN = registerBlockWithoutItem("baobab_wall_hanging_sign",
+            properties -> new BaobabWallHangingSignBlock(properties.noCollision().strength(1.0F)),
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.ACACIA_WALL_HANGING_SIGN));
 
     public static final DeferredBlock<Block> BAOBAB_LEAVES = registerBlock("baobab_leaves",
-            () -> new LeavesBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_LEAVES).randomTicks()));
+            properties -> new TintedParticleLeavesBlock(0.01F, properties.randomTicks()),
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.ACACIA_LEAVES));
 
     public static final DeferredBlock<Block> BAOBAB_SAPLING = registerBlock("baobab_sapling",
-            () -> new BaobabSaplingBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.ACACIA_SAPLING)));
+            BaobabSaplingBlock::new,
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.ACACIA_SAPLING));
 
-    public static final DeferredBlock<Block> POTTED_BAOBAB_SAPLING = BLOCKS.register("potted_baobab_sapling",
-            () -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, BAOBAB_SAPLING, BlockBehaviour.Properties.ofFullCopy(Blocks.POTTED_ACACIA_SAPLING).noOcclusion()));
+    public static final DeferredBlock<Block> POTTED_BAOBAB_SAPLING = registerBlockWithoutItem("potted_baobab_sapling",
+            properties -> new FlowerPotBlock(() -> (FlowerPotBlock) Blocks.FLOWER_POT, BAOBAB_SAPLING, properties.noOcclusion()),
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.POTTED_ACACIA_SAPLING));
 
     public static final DeferredBlock<Block> BAOBAB_LITTER = registerBlock("baobab_litter",
-            () -> new BaobabLitterBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.PINK_PETALS)));
+            BaobabLitterBlock::new,
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.PINK_PETALS));
 
     public static final DeferredBlock<Block> TREE_ROOT = registerBlock("tree_root",
-            () -> new TreeRootBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.MUDDY_MANGROVE_ROOTS).sound(SoundType.ROOTED_DIRT)));
+            properties -> new TreeRootBlock(properties.sound(SoundType.ROOTED_DIRT)),
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.MUDDY_MANGROVE_ROOTS));
 
     public static final DeferredBlock<Block> BAOBAB_FRUIT_POD = registerBlock("baobab_fruit_pod",
-            () -> new BaobabFruitPodBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.COCOA).randomTicks().sound(SoundType.CROP)));
+            properties -> new BaobabFruitPodBlock(properties.randomTicks().sound(SoundType.CROP)),
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.COCOA));
 
     public static final DeferredBlock<Block> SMALL_BAOBAB_FRUIT_POD = registerBlock("small_baobab_fruit_pod",
-            () -> new BaobabHangingPodBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.COCOA).sound(SoundType.CROP), 0));
+            properties -> new BaobabHangingPodBlock(properties.sound(SoundType.CROP), 0),
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.COCOA));
 
     public static final DeferredBlock<Block> MEDIUM_BAOBAB_FRUIT_POD = registerBlock("medium_baobab_fruit_pod",
-            () -> new BaobabHangingPodBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.COCOA).sound(SoundType.CROP), 1));
+            properties -> new BaobabHangingPodBlock(properties.sound(SoundType.CROP), 1),
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.COCOA));
 
     public static final DeferredBlock<Block> LARGE_BAOBAB_FRUIT_POD = registerBlock("large_baobab_fruit_pod",
-            () -> new BaobabHangingPodBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.COCOA).sound(SoundType.CROP), 2));
+            properties -> new BaobabHangingPodBlock(properties.sound(SoundType.CROP), 2),
+            () -> BlockBehaviour.Properties.ofLegacyCopy(Blocks.COCOA));
 
     private ModBlocks() {
     }
 
-    private static <T extends Block> DeferredBlock<T> registerBlock(String name, Supplier<T> blockSupplier) {
-        DeferredBlock<T> block = BLOCKS.register(name, blockSupplier);
-        ModItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
+    private static <T extends Block> DeferredBlock<T> registerBlock(String name, Function<BlockBehaviour.Properties, T> blockFactory, Supplier<BlockBehaviour.Properties> properties) {
+        DeferredBlock<T> block = BLOCKS.registerBlock(name, blockFactory, properties);
+        ModItems.ITEMS.registerSimpleBlockItem(block);
         return block;
+    }
+
+    private static <T extends Block> DeferredBlock<T> registerBlockWithoutItem(String name, Function<BlockBehaviour.Properties, T> blockFactory, Supplier<BlockBehaviour.Properties> properties) {
+        return BLOCKS.registerBlock(name, blockFactory, properties);
     }
 
     public static void register(IEventBus eventBus) {

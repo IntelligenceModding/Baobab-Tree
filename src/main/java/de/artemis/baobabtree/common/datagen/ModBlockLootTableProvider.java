@@ -3,7 +3,7 @@ package de.artemis.baobabtree.common.datagen;
 import de.artemis.baobabtree.common.block.BaobabFruitPodBlock;
 import de.artemis.baobabtree.common.registry.ModBlocks;
 import de.artemis.baobabtree.common.registry.ModItems;
-import net.minecraft.advancements.critereon.StatePropertiesPredicate;
+import net.minecraft.advancements.criterion.StatePropertiesPredicate;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.world.flag.FeatureFlags;
@@ -38,6 +38,7 @@ public class ModBlockLootTableProvider extends BlockLootSubProvider {
         dropSelf(ModBlocks.BAOBAB_PRESSURE_PLATE.get());
         add(ModBlocks.BAOBAB_DOOR.get(), createDoorTable(ModBlocks.BAOBAB_DOOR.get()));
         dropSelf(ModBlocks.BAOBAB_TRAPDOOR.get());
+        dropSelf(ModBlocks.BAOBAB_SHELF.get());
 
         add(ModBlocks.BAOBAB_SIGN.get(), createSingleItemTable(ModItems.BAOBAB_SIGN.get()));
         add(ModBlocks.BAOBAB_WALL_SIGN.get(), createSingleItemTable(ModItems.BAOBAB_SIGN.get()));

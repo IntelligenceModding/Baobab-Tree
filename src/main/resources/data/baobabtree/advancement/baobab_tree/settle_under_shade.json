@@ -1,0 +1,60 @@
+{
+  "parent": "baobabtree:baobab_tree/savanna_joinery",
+  "display": {
+    "description": {
+      "translate": "advancements.baobabtree.settle_under_shade.description"
+    },
+    "frame": "task",
+    "icon": {
+      "id": "baobabtree:baobab_shelf"
+    },
+    "title": {
+      "translate": "advancements.baobabtree.settle_under_shade.title"
+    },
+    "x": 8,
+    "y": -1
+  },
+  "criteria": {
+    "has_baobab_hanging_sign": {
+      "conditions": {
+        "items": [
+          {
+            "items": "baobabtree:baobab_hanging_sign"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_baobab_shelf": {
+      "conditions": {
+        "items": [
+          {
+            "items": "baobabtree:baobab_shelf"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_baobab_sign": {
+      "conditions": {
+        "items": [
+          {
+            "items": "baobabtree:baobab_sign"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_baobab_shelf"
+    ],
+    [
+      "has_baobab_sign"
+    ],
+    [
+      "has_baobab_hanging_sign"
+    ]
+  ]
+}

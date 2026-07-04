@@ -55,7 +55,6 @@ public final class TreeRootClimbHandler {
         }
 
         player.setDeltaMovement(x, y, z);
-        player.hasImpulse = true;
 
         if (activeClimb && player.tickCount % 4 == 0) {
             playClimbFeedback(player, level, touchingCeilingRoot);
@@ -84,20 +83,20 @@ public final class TreeRootClimbHandler {
     }
 
     private static void playClimbFeedback(Player player, Level level, boolean ceilingClimb) {
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             return;
         }
 
         level.addParticle(
                 new BlockParticleOption(ParticleTypes.BLOCK, Blocks.ROOTED_DIRT.defaultBlockState()),
-                player.getX() + (level.random.nextDouble() - 0.5D) * 0.3D,
+                player.getX() + (level.getRandom().nextDouble() - 0.5D) * 0.3D,
                 player.getY() + (ceilingClimb ? 1.7D : 0.8D),
-                player.getZ() + (level.random.nextDouble() - 0.5D) * 0.3D,
-                (level.random.nextDouble() - 0.5D) * 0.02D,
+                player.getZ() + (level.getRandom().nextDouble() - 0.5D) * 0.3D,
+                (level.getRandom().nextDouble() - 0.5D) * 0.02D,
                 ceilingClimb ? -0.01D : 0.015D,
-                (level.random.nextDouble() - 0.5D) * 0.02D
+                (level.getRandom().nextDouble() - 0.5D) * 0.02D
         );
-        if (level.random.nextFloat() < 0.55F) {
+        if (level.getRandom().nextFloat() < 0.55F) {
             level.playLocalSound(
                 player.getX(),
                 player.getY() + 0.5D,
@@ -105,7 +104,7 @@ public final class TreeRootClimbHandler {
                 Blocks.ROOTED_DIRT.defaultBlockState().getSoundType().getStepSound(),
                 SoundSource.PLAYERS,
                 0.16F,
-                0.9F + level.random.nextFloat() * 0.18F,
+                0.9F + level.getRandom().nextFloat() * 0.18F,
                 false
             );
         }

@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/leaves",
+  "textures": {
+    "all": "baobabtree:block/baobab_leaves"
+  }
+}

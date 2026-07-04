@@ -2,76 +2,101 @@ package de.artemis.baobabtree.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import de.artemis.baobabtree.common.block.BaobabLitterBlock;
 import de.artemis.baobabtree.common.block.BaobabHangingPodBlock;
+import de.artemis.baobabtree.common.block.BaobabLitterBlock;
 import de.artemis.baobabtree.common.block.entity.BaobabLitterBlockEntity;
 import de.artemis.baobabtree.common.registry.ModBlocks;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.BlockModelRenderState;
+import net.minecraft.client.renderer.block.BlockModelResolver;
+import net.minecraft.client.renderer.block.model.BlockDisplayContext;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
+import org.jspecify.annotations.Nullable;
 
-public class BaobabLitterBlockEntityRenderer implements BlockEntityRenderer<BaobabLitterBlockEntity> {
+public class BaobabLitterBlockEntityRenderer implements BlockEntityRenderer<BaobabLitterBlockEntity, BaobabLitterBlockEntityRenderer.RenderState> {
     private static final float[][] QUADRANT_BOUNDS = new float[][]{
-            {0.5F, 1.0F, 0.5F, 1.0F}, // southeast
-            {0.5F, 1.0F, 0.0F, 0.5F}, // northeast
-            {0.0F, 0.5F, 0.0F, 0.5F}, // northwest
-            {0.0F, 0.5F, 0.5F, 1.0F}  // southwest
+            {0.5F, 1.0F, 0.5F, 1.0F},
+            {0.5F, 1.0F, 0.0F, 0.5F},
+            {0.0F, 0.5F, 0.0F, 0.5F},
+            {0.0F, 0.5F, 0.5F, 1.0F}
     };
 
-    private final BlockRenderDispatcher blockRenderDispatcher;
+    private final BlockModelResolver blockModelResolver;
 
     public BaobabLitterBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
-        this.blockRenderDispatcher = context.getBlockRenderDispatcher();
+        this.blockModelResolver = context.blockModelResolver();
     }
 
     @Override
-    public void render(BaobabLitterBlockEntity blockEntity,
-                       float partialTick,
-                       PoseStack poseStack,
-                       MultiBufferSource bufferSource,
-                       int packedLight,
-                       int packedOverlay) {
-        BlockState state = blockEntity.getBlockState();
-        Block podBlock = BaobabLitterBlock.podBlockForState(state);
+    public RenderState createRenderState() {
+        return new RenderState();
+    }
+
+    @Override
+    public void extractRenderState(
+            BaobabLitterBlockEntity blockEntity,
+            RenderState state,
+            float partialTicks,
+            Vec3 cameraPosition,
+            ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress
+    ) {
+        BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
+
+        BlockState litterState = blockEntity.getBlockState();
+        Block podBlock = BaobabLitterBlock.podBlockForState(litterState);
+        state.visible = podBlock != null;
+        state.podModel.clear();
         if (podBlock == null) {
             return;
         }
 
         RandomSource random = RandomSource.create(blockEntity.getBlockPos().asLong() * 31L + 17L);
         float scale = podScale(podBlock);
-        OccupiedArea occupiedArea = occupiedArea(state);
+        OccupiedArea occupiedArea = occupiedArea(litterState);
         float halfFootprint = podHalfFootprint(podBlock, scale);
-        float xCenter = randomBetween(random, occupiedArea.minX() + halfFootprint, occupiedArea.maxX() - halfFootprint);
-        float zCenter = randomBetween(random, occupiedArea.minZ() + halfFootprint, occupiedArea.maxZ() - halfFootprint);
-        float yOffset = groundedYOffset(state, podBlock);
-        Direction facing = Direction.Plane.HORIZONTAL.getRandomDirection(random);
-        BlockState podState = podBlock.defaultBlockState().setValue(BaobabHangingPodBlock.FACING, facing);
-        float tiltX = (random.nextFloat() - 0.5F) * 18.0F;
-        float tiltZ = (random.nextFloat() - 0.5F) * 18.0F;
+
+        state.xOffset = randomBetween(random, occupiedArea.minX() + halfFootprint, occupiedArea.maxX() - halfFootprint) - (scale * 0.5F);
+        state.zOffset = randomBetween(random, occupiedArea.minZ() + halfFootprint, occupiedArea.maxZ() - halfFootprint) - (scale * 0.5F);
+        state.yOffset = groundedYOffset(litterState, podBlock);
+        state.scale = scale;
+        state.tiltX = (random.nextFloat() - 0.5F) * 18.0F;
+        state.tiltZ = (random.nextFloat() - 0.5F) * 18.0F;
+
+        BlockState podState = podBlock.defaultBlockState().setValue(
+                BaobabHangingPodBlock.FACING,
+                Direction.Plane.HORIZONTAL.getRandomDirection(random)
+        );
+        this.blockModelResolver.update(state.podModel, podState, BlockDisplayContext.create());
+    }
+
+    @Override
+    public void submit(RenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
+        if (!state.visible || state.podModel.isEmpty()) {
+            return;
+        }
 
         poseStack.pushPose();
-        poseStack.translate(xCenter - (scale * 0.5F), yOffset, zCenter - (scale * 0.5F));
-        poseStack.scale(scale, scale, scale);
+        poseStack.translate(state.xOffset, state.yOffset, state.zOffset);
+        poseStack.scale(state.scale, state.scale, state.scale);
         poseStack.translate(0.5F, 0.0F, 0.5F);
-        poseStack.mulPose(Axis.XP.rotationDegrees(tiltX));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(tiltZ));
+        poseStack.mulPose(Axis.XP.rotationDegrees(state.tiltX));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(state.tiltZ));
         poseStack.translate(-0.5F, 0.0F, -0.5F);
-        blockRenderDispatcher.renderSingleBlock(
-                podState,
-                poseStack,
-                bufferSource,
-                packedLight,
-                net.minecraft.client.renderer.texture.OverlayTexture.NO_OVERLAY
-        );
+        state.podModel.submitMultiLayer(poseStack, submitNodeCollector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
         poseStack.popPose();
     }
 
-    private float podScale(Block podBlock) {
+    private static float podScale(Block podBlock) {
         if (podBlock == ModBlocks.SMALL_BAOBAB_FRUIT_POD.get()) {
             return 0.72F;
         }
@@ -81,7 +106,7 @@ public class BaobabLitterBlockEntityRenderer implements BlockEntityRenderer<Baob
         return 0.54F;
     }
 
-    private float groundedYOffset(BlockState litterState, Block podBlock) {
+    private static float groundedYOffset(BlockState litterState, Block podBlock) {
         float litterLift = (litterState.getValue(BaobabLitterBlock.AMOUNT) - 1) * 0.003F;
         if (podBlock == ModBlocks.SMALL_BAOBAB_FRUIT_POD.get()) {
             return -0.115F + litterLift;
@@ -92,7 +117,7 @@ public class BaobabLitterBlockEntityRenderer implements BlockEntityRenderer<Baob
         return -0.155F + litterLift;
     }
 
-    private float podHalfFootprint(Block podBlock, float scale) {
+    private static float podHalfFootprint(Block podBlock, float scale) {
         float widthFraction;
         if (podBlock == ModBlocks.SMALL_BAOBAB_FRUIT_POD.get()) {
             widthFraction = 4.0F / 16.0F;
@@ -104,14 +129,14 @@ public class BaobabLitterBlockEntityRenderer implements BlockEntityRenderer<Baob
         return (scale * widthFraction) * 0.5F + 0.01F;
     }
 
-    private float randomBetween(RandomSource random, float min, float max) {
+    private static float randomBetween(RandomSource random, float min, float max) {
         if (max <= min) {
             return (min + max) * 0.5F;
         }
         return min + random.nextFloat() * (max - min);
     }
 
-    private OccupiedArea occupiedArea(BlockState state) {
+    private static OccupiedArea occupiedArea(BlockState state) {
         int amount = state.getValue(BaobabLitterBlock.AMOUNT);
         int[] occupied = new int[amount];
         int facingIndex = state.getValue(BaobabLitterBlock.FACING).get2DDataValue();
@@ -135,5 +160,16 @@ public class BaobabLitterBlockEntityRenderer implements BlockEntityRenderer<Baob
     }
 
     private record OccupiedArea(float minX, float maxX, float minZ, float maxZ) {
+    }
+
+    public static class RenderState extends BlockEntityRenderState {
+        public final BlockModelRenderState podModel = new BlockModelRenderState();
+        public boolean visible;
+        public float xOffset;
+        public float yOffset;
+        public float zOffset;
+        public float scale;
+        public float tiltX;
+        public float tiltZ;
     }
 }

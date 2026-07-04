@@ -9,10 +9,10 @@ import net.neoforged.fml.common.Mod;
 public class BaobabTreeClient {
     public BaobabTreeClient(IEventBus modEventBus) {
         modEventBus.addListener(ClientModEvents::onClientSetup);
+        modEventBus.addListener(ClientModEvents::registerLayerDefinitions);
         modEventBus.addListener(ClientModEvents::registerEntityRenderers);
         modEventBus.addListener(ClientModEvents::registerBlockEntityRenderers);
         modEventBus.addListener(ClientModEvents::registerParticleProviders);
-        modEventBus.addListener(ClientModEvents::registerBlockColors);
-        modEventBus.addListener(ClientModEvents::registerItemColors);
+        modEventBus.addListener(ClientModEvents::registerBlockTintSources);
     }
 }

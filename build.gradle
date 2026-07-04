@@ -27,15 +27,13 @@ base {
     archivesName = mod_id
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+def clientGeneratedResources = file('src/generated/client')
+def serverGeneratedResources = file('src/generated/server')
 
 neoForge {
     version = project.neo_version
-
-    parchment {
-        mappingsVersion = project.parchment_mappings_version
-        minecraftVersion = project.parchment_minecraft_version
-    }
 
     runs {
         client {
@@ -54,11 +52,19 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
-        data {
-            data()
+        clientData {
+            clientData()
             programArguments.addAll '--mod', project.mod_id,
                     '--all',
-                    '--output', file('src/generated/resources/').getAbsolutePath(),
+                    '--output', clientGeneratedResources.getAbsolutePath(),
+                    '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+
+        serverData {
+            serverData()
+            programArguments.addAll '--mod', project.mod_id,
+                    '--all',
+                    '--output', serverGeneratedResources.getAbsolutePath(),
                     '--existing', file('src/main/resources/').getAbsolutePath()
         }
 
@@ -75,9 +81,11 @@ neoForge {
     }
 }
 
-sourceSets.main.resources {
-    srcDir 'src/generated/resources'
-}
+sourceSets.main.resources.setSrcDirs([
+        'src/main/resources',
+        clientGeneratedResources,
+        serverGeneratedResources
+])
 
 configurations {
     runtimeClasspath.extendsFrom localRuntime
@@ -114,8 +122,8 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
-tasks.register('runClientData') {
-    dependsOn tasks.named('runData')
+tasks.named('processResources', ProcessResources).configure {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 publishing {

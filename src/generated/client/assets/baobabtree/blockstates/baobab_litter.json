@@ -1,0 +1,199 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_litter_1"
+      },
+      "when": {
+        "amount": "1",
+        "facing": "north"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_litter_1",
+        "y": 90
+      },
+      "when": {
+        "amount": "1",
+        "facing": "east"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_litter_1",
+        "y": 180
+      },
+      "when": {
+        "amount": "1",
+        "facing": "south"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_litter_1",
+        "y": 270
+      },
+      "when": {
+        "amount": "1",
+        "facing": "west"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_litter_2"
+      },
+      "when": {
+        "amount": "2",
+        "facing": "north"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_litter_2",
+        "y": 90
+      },
+      "when": {
+        "amount": "2",
+        "facing": "east"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_litter_2",
+        "y": 180
+      },
+      "when": {
+        "amount": "2",
+        "facing": "south"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_litter_2",
+        "y": 270
+      },
+      "when": {
+        "amount": "2",
+        "facing": "west"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_litter_2"
+      },
+      "when": {
+        "amount": "3",
+        "facing": "north"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_litter_2",
+        "y": 90
+      },
+      "when": {
+        "amount": "3",
+        "facing": "east"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_litter_2",
+        "y": 180
+      },
+      "when": {
+        "amount": "3",
+        "facing": "south"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_litter_2",
+        "y": 270
+      },
+      "when": {
+        "amount": "3",
+        "facing": "west"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_litter_3"
+      },
+      "when": {
+        "amount": "3",
+        "facing": "north"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_litter_3",
+        "y": 90
+      },
+      "when": {
+        "amount": "3",
+        "facing": "east"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_litter_3",
+        "y": 180
+      },
+      "when": {
+        "amount": "3",
+        "facing": "south"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_litter_3",
+        "y": 270
+      },
+      "when": {
+        "amount": "3",
+        "facing": "west"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_litter_4"
+      },
+      "when": {
+        "amount": "4",
+        "facing": "north"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_litter_4",
+        "y": 90
+      },
+      "when": {
+        "amount": "4",
+        "facing": "east"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_litter_4",
+        "y": 180
+      },
+      "when": {
+        "amount": "4",
+        "facing": "south"
+      }
+    },
+    {
+      "apply": {
+        "model": "baobabtree:block/baobab_litter_4",
+        "y": 270
+      },
+      "when": {
+        "amount": "4",
+        "facing": "west"
+      }
+    }
+  ]
+}

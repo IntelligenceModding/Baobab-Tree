@@ -9,34 +9,36 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.PinkPetalsBlock;
+import net.minecraft.world.level.block.LeafLitterBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.neoforge.common.ItemAbilities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class BaobabLitterBlock extends PinkPetalsBlock implements EntityBlock {
-    public static final MapCodec<BaobabLitterBlock> CODEC = simpleCodec(BaobabLitterBlock::new);
+public class BaobabLitterBlock extends LeafLitterBlock implements EntityBlock {
+    public static final MapCodec<LeafLitterBlock> CODEC = simpleCodec(BaobabLitterBlock::new);
+    public static final IntegerProperty AMOUNT = IntegerProperty.create("amount", 1, 4);
     public static final BooleanProperty HAS_SMALL = BooleanProperty.create("has_small");
     public static final BooleanProperty HAS_MEDIUM = BooleanProperty.create("has_medium");
     public static final BooleanProperty HAS_LARGE = BooleanProperty.create("has_large");
 
-    public BaobabLitterBlock(Properties properties) {
+    public BaobabLitterBlock(BlockBehaviour.Properties properties) {
         super(properties);
         registerDefaultState(defaultBlockState()
                 .setValue(HAS_SMALL, false)
@@ -45,9 +47,13 @@ public class BaobabLitterBlock extends PinkPetalsBlock implements EntityBlock {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
-    public @NotNull MapCodec<PinkPetalsBlock> codec() {
-        return (MapCodec<PinkPetalsBlock>) (MapCodec<?>) CODEC;
+    protected @NotNull MapCodec<LeafLitterBlock> codec() {
+        return CODEC;
+    }
+
+    @Override
+    public IntegerProperty getSegmentAmountProperty() {
+        return AMOUNT;
     }
 
     @Override
@@ -80,33 +86,31 @@ public class BaobabLitterBlock extends PinkPetalsBlock implements EntityBlock {
     }
 
     @Override
-    protected @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack stack,
-                                                       @NotNull BlockState state,
-                                                       @NotNull Level level,
-                                                       @NotNull BlockPos pos,
-                                                       @NotNull Player player,
-                                                       @NotNull InteractionHand hand,
-                                                       @NotNull BlockHitResult hitResult) {
+    protected @NotNull InteractionResult useItemOn(@NotNull ItemStack stack,
+                                                   @NotNull BlockState state,
+                                                   @NotNull Level level,
+                                                   @NotNull BlockPos pos,
+                                                   @NotNull Player player,
+                                                   @NotNull InteractionHand hand,
+                                                   @NotNull BlockHitResult hitResult) {
         if (stack.isEmpty()) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
 
-        if (stack.canPerformAction(ItemAbilities.PICKAXE_DIG)) {
+        if (stack.is(ItemTags.PICKAXES)) {
             if (!level.isClientSide()) {
                 harvestOneLayer(level, pos, state);
-                level.playSound(null, pos, SoundEvents.GRASS_BREAK, SoundSource.BLOCKS, 0.75F, 0.95F + level.random.nextFloat() * 0.1F);
+                level.playSound(null, pos, SoundEvents.GRASS_BREAK, SoundSource.BLOCKS, 0.75F, 0.95F + level.getRandom().nextFloat() * 0.1F);
             }
-            return ItemInteractionResult.sidedSuccess(level.isClientSide());
+            return level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER;
         }
 
         InteractionResult itemUseResult = stack.useOn(new UseOnContext(player, hand, hitResult));
-        if (itemUseResult == InteractionResult.PASS) {
+        if (itemUseResult == InteractionResult.PASS || itemUseResult == InteractionResult.TRY_WITH_EMPTY_HAND) {
             return rummageAndRemoveWithItem(state, level, pos, player);
         }
 
-        return itemUseResult.consumesAction()
-                ? ItemInteractionResult.sidedSuccess(level.isClientSide())
-                : ItemInteractionResult.FAIL;
+        return itemUseResult;
     }
 
     @Override
@@ -126,17 +130,16 @@ public class BaobabLitterBlock extends PinkPetalsBlock implements EntityBlock {
         int amountBefore = state.getValue(AMOUNT);
         rummage((ServerLevel) level, pos, state, player, amountBefore);
         level.removeBlock(pos, false);
-        level.playSound(null, pos, SoundEvents.GRASS_BREAK, SoundSource.BLOCKS, 0.75F, 0.9F + level.random.nextFloat() * 0.2F);
+        level.playSound(null, pos, SoundEvents.GRASS_BREAK, SoundSource.BLOCKS, 0.75F, 0.9F + level.getRandom().nextFloat() * 0.2F);
         return InteractionResult.CONSUME;
     }
 
-    private ItemInteractionResult rummageAndRemoveWithItem(BlockState state, Level level, BlockPos pos, Player player) {
-        rummageAndRemove(state, level, pos, player);
-        return ItemInteractionResult.sidedSuccess(level.isClientSide());
+    private InteractionResult rummageAndRemoveWithItem(BlockState state, Level level, BlockPos pos, Player player) {
+        return rummageAndRemove(state, level, pos, player);
     }
 
     private void rummage(ServerLevel level, BlockPos pos, BlockState state, Player player, int amountBefore) {
-        RandomSource random = level.random;
+        RandomSource random = level.getRandom();
         Block podBlock = podBlockForState(state);
         if (podBlock != null) {
             giveToPlayerOrDrop(level, pos, player, new ItemStack(podBlock));

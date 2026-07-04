@@ -23,7 +23,7 @@ public final class BaobabTreeCommands {
     public static void register(RegisterCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
         dispatcher.register(Commands.literal("baobabtree")
-                .requires(source -> source.hasPermission(4))
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("spawn")
                         .then(Commands.literal("young")
                                 .executes(context -> spawnVariant(context, BaobabTreeGenerator.Variant.YOUNG, sourcePos(context)))

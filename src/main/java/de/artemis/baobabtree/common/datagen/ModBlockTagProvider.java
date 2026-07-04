@@ -6,16 +6,15 @@ import de.artemis.baobabtree.common.registry.ModTags;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;
+import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nullable;
 import java.util.concurrent.CompletableFuture;
 
 public class ModBlockTagProvider extends BlockTagsProvider {
-    public ModBlockTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper) {
-        super(output, lookupProvider, BaobabTree.MOD_ID, existingFileHelper);
+    public ModBlockTagProvider(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+        super(output, lookupProvider, BaobabTree.MOD_ID);
     }
 
     @Override
@@ -34,6 +33,7 @@ public class ModBlockTagProvider extends BlockTagsProvider {
                 .add(ModBlocks.BAOBAB_PRESSURE_PLATE.get())
                 .add(ModBlocks.BAOBAB_DOOR.get())
                 .add(ModBlocks.BAOBAB_TRAPDOOR.get())
+                .add(ModBlocks.BAOBAB_SHELF.get())
                 .add(ModBlocks.BAOBAB_SIGN.get())
                 .add(ModBlocks.BAOBAB_WALL_SIGN.get())
                 .add(ModBlocks.BAOBAB_HANGING_SIGN.get())
@@ -54,6 +54,21 @@ public class ModBlockTagProvider extends BlockTagsProvider {
         tag(BlockTags.LEAVES)
                 .add(ModBlocks.BAOBAB_LEAVES.get());
 
+        tag(BlockTags.FLOWER_POTS)
+                .add(ModBlocks.POTTED_BAOBAB_SAPLING.get());
+
+        tag(BlockTags.CLIMBABLE)
+                .add(ModBlocks.TREE_ROOT.get());
+
+        tag(BlockTags.REPLACEABLE_BY_TREES)
+                .add(ModBlocks.BAOBAB_LITTER.get());
+
+        tag(BlockTags.LOGS)
+                .add(ModBlocks.BAOBAB_LOG.get())
+                .add(ModBlocks.BAOBAB_WOOD.get())
+                .add(ModBlocks.STRIPPED_BAOBAB_LOG.get())
+                .add(ModBlocks.STRIPPED_BAOBAB_WOOD.get());
+
         tag(BlockTags.LOGS_THAT_BURN)
                 .add(ModBlocks.BAOBAB_LOG.get())
                 .add(ModBlocks.BAOBAB_WOOD.get())
@@ -65,6 +80,18 @@ public class ModBlockTagProvider extends BlockTagsProvider {
                 .add(ModBlocks.BAOBAB_WOOD.get())
                 .add(ModBlocks.STRIPPED_BAOBAB_LOG.get())
                 .add(ModBlocks.STRIPPED_BAOBAB_WOOD.get());
+
+        tag(Tags.Blocks.FENCE_GATES_WOODEN)
+                .add(ModBlocks.BAOBAB_FENCE_GATE.get());
+
+        tag(Tags.Blocks.STRIPPED_LOGS)
+                .add(ModBlocks.STRIPPED_BAOBAB_LOG.get());
+
+        tag(Tags.Blocks.STRIPPED_WOODS)
+                .add(ModBlocks.STRIPPED_BAOBAB_WOOD.get());
+
+        tag(Tags.Blocks.NATURAL_WOODS)
+                .add(ModBlocks.BAOBAB_WOOD.get());
 
         tag(BlockTags.PLANKS)
                 .add(ModBlocks.BAOBAB_PLANKS.get());
@@ -92,6 +119,9 @@ public class ModBlockTagProvider extends BlockTagsProvider {
 
         tag(BlockTags.WOODEN_TRAPDOORS)
                 .add(ModBlocks.BAOBAB_TRAPDOOR.get());
+
+        tag(BlockTags.WOODEN_SHELVES)
+                .add(ModBlocks.BAOBAB_SHELF.get());
 
         tag(BlockTags.STANDING_SIGNS)
                 .add(ModBlocks.BAOBAB_SIGN.get());

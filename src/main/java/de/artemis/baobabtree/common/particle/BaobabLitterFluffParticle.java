@@ -3,15 +3,15 @@ package de.artemis.baobabtree.common.particle;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.SingleQuadParticle;
 import net.minecraft.client.particle.SpriteSet;
-import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.core.particles.SimpleParticleType;
+import net.minecraft.util.RandomSource;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 
-public class BaobabLitterFluffParticle extends TextureSheetParticle {
+public class BaobabLitterFluffParticle extends SingleQuadParticle {
     private final float driftStrength;
     private final float swirlPhase;
 
@@ -23,7 +23,7 @@ public class BaobabLitterFluffParticle extends TextureSheetParticle {
                                         double xSpeed,
                                         double ySpeed,
                                         double zSpeed) {
-        super(level, x, y, z, xSpeed, ySpeed, zSpeed);
+        super(level, x, y, z, xSpeed, ySpeed, zSpeed, spriteSet.get(level.getRandom()));
 
         double angle = random.nextDouble() * Math.PI * 2.0D;
         double launch = 0.016D + random.nextDouble() * 0.012D;
@@ -82,8 +82,8 @@ public class BaobabLitterFluffParticle extends TextureSheetParticle {
     }
 
     @Override
-    public @NotNull ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+    public @NotNull SingleQuadParticle.Layer getLayer() {
+        return SingleQuadParticle.Layer.TRANSLUCENT;
     }
 
     public static class Provider implements ParticleProvider<SimpleParticleType> {
@@ -102,7 +102,8 @@ public class BaobabLitterFluffParticle extends TextureSheetParticle {
                                        double z,
                                        double xSpeed,
                                        double ySpeed,
-                                       double zSpeed) {
+                                       double zSpeed,
+                                       @NotNull RandomSource random) {
             return new BaobabLitterFluffParticle(level, x, y, z, this.spriteSet, xSpeed, ySpeed, zSpeed);
         }
     }

@@ -1,0 +1,29 @@
+{
+  "parent": "baobabtree:baobab_tree/forest_floor_findings",
+  "display": {
+    "description": {
+      "translate": "advancements.baobabtree.root_cause.description"
+    },
+    "frame": "task",
+    "icon": {
+      "id": "baobabtree:tree_root"
+    },
+    "title": {
+      "translate": "advancements.baobabtree.root_cause.title"
+    },
+    "x": 4,
+    "y": 2
+  },
+  "criteria": {
+    "has_tree_root": {
+      "conditions": {
+        "items": [
+          {
+            "items": "baobabtree:tree_root"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  }
+}

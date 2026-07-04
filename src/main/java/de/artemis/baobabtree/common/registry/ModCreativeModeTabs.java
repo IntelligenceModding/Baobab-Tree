@@ -18,7 +18,7 @@ public final class ModCreativeModeTabs {
     public static final Supplier<CreativeModeTab> BAOBAB_TREE = CREATIVE_MODE_TABS.register(
             "baobab_tree",
             () -> CreativeModeTab.builder()
-                    .icon(() -> new ItemStack(ModBlocks.LARGE_BAOBAB_FRUIT_POD.get()))
+                    .icon(() -> new ItemStack(ModBlocks.BAOBAB_SAPLING.get()))
                     .title(Component.translatable("itemGroup.baobabtree"))
                     .displayItems((parameters, output) -> {
                         output.accept(ModBlocks.BAOBAB_LOG);
@@ -32,6 +32,7 @@ public final class ModCreativeModeTabs {
                         output.accept(ModBlocks.BAOBAB_FENCE_GATE);
                         output.accept(ModBlocks.BAOBAB_DOOR);
                         output.accept(ModBlocks.BAOBAB_TRAPDOOR);
+                        output.accept(ModBlocks.BAOBAB_SHELF);
                         output.accept(ModBlocks.BAOBAB_BUTTON);
                         output.accept(ModBlocks.BAOBAB_PRESSURE_PLATE);
                         output.accept(ModItems.BAOBAB_SIGN);

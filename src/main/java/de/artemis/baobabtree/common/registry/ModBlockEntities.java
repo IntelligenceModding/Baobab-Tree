@@ -16,26 +16,26 @@ public final class ModBlockEntities {
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BaobabSignBlockEntity>> BAOBAB_SIGN =
             BLOCK_ENTITIES.register("baobab_sign",
-                    () -> BlockEntityType.Builder.of(
+                    () -> new BlockEntityType<>(
                             BaobabSignBlockEntity::new,
                             ModBlocks.BAOBAB_SIGN.get(),
                             ModBlocks.BAOBAB_WALL_SIGN.get()
-                    ).build(null));
+                    ));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BaobabHangingSignBlockEntity>> BAOBAB_HANGING_SIGN =
             BLOCK_ENTITIES.register("baobab_hanging_sign",
-                    () -> BlockEntityType.Builder.of(
+                    () -> new BlockEntityType<>(
                             BaobabHangingSignBlockEntity::new,
                             ModBlocks.BAOBAB_HANGING_SIGN.get(),
                             ModBlocks.BAOBAB_WALL_HANGING_SIGN.get()
-                    ).build(null));
+                    ));
 
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BaobabLitterBlockEntity>> BAOBAB_LITTER =
             BLOCK_ENTITIES.register("baobab_litter",
-                    () -> BlockEntityType.Builder.of(
+                    () -> new BlockEntityType<>(
                             BaobabLitterBlockEntity::new,
                             ModBlocks.BAOBAB_LITTER.get()
-                    ).build(null));
+                    ));
 
     private ModBlockEntities() {
     }

@@ -25,7 +25,7 @@ public final class ModUtils {
     }
 
     public static void spawnItemAtClickedSide(@NotNull Level level, @NotNull BlockPos blockPos, @NotNull Direction face, @NotNull ItemStack itemStack) {
-        if (itemStack.isEmpty() || level.isClientSide) {
+        if (itemStack.isEmpty() || level.isClientSide()) {
             return;
         }
 

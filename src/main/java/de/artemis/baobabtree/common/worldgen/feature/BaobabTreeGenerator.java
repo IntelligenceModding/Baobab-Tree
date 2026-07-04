@@ -1,5 +1,6 @@
 package de.artemis.baobabtree.common.worldgen.feature;
 
+import de.artemis.baobabtree.common.block.BaobabLitterBlock;
 import de.artemis.baobabtree.common.registry.ModBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -9,9 +10,11 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoublePlantBlock;
+import net.minecraft.world.level.block.FlowerBedBlock;
+import net.minecraft.world.level.block.LeafLitterBlock;
 import net.minecraft.world.level.block.LeavesBlock;
-import net.minecraft.world.level.block.PinkPetalsBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.SegmentableBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -99,7 +102,7 @@ public final class BaobabTreeGenerator {
     }
 
     private static boolean generate(WorldGenLevel level, BlockPos origin, RandomSource random, Variant variant, boolean withGroundDecoration) {
-        if (origin.getY() <= level.getMinBuildHeight() + 1) {
+        if (origin.getY() <= level.getMinY() + 1) {
             return false;
         }
 
@@ -180,7 +183,7 @@ public final class BaobabTreeGenerator {
             }
         }
 
-        return origin.getY() + trunkHeight + variant.maxLeafRadius + 6 < level.getMaxBuildHeight();
+        return origin.getY() + trunkHeight + variant.maxLeafRadius + 6 < level.getMaxY();
     }
 
     private static boolean generateFallen(WorldGenLevel level, BlockPos origin, RandomSource random, boolean withGroundDecoration) {
@@ -296,7 +299,7 @@ public final class BaobabTreeGenerator {
             }
         }
 
-        return origin.getY() + stumpHeight + 8 < level.getMaxBuildHeight();
+        return origin.getY() + stumpHeight + 8 < level.getMaxY();
     }
 
     private static boolean isAllowedSoil(BlockState state) {
@@ -687,15 +690,10 @@ public final class BaobabTreeGenerator {
 
                 if (random.nextFloat() < 0.42F) {
                     setGeneratedBlock(level, placePos, ModBlocks.BAOBAB_LITTER.get().defaultBlockState()
-                            .setValue(PinkPetalsBlock.AMOUNT, 1 + random.nextInt(4))
-                            .setValue(PinkPetalsBlock.FACING, Direction.Plane.HORIZONTAL.getRandomDirection(random)));
+                            .setValue(BaobabLitterBlock.AMOUNT, 1 + random.nextInt(4))
+                            .setValue(BaobabLitterBlock.FACING, Direction.Plane.HORIZONTAL.getRandomDirection(random)));
                 } else if (random.nextFloat() < 0.38F) {
-                    BlockState foliage = random.nextInt(10) < 6
-                            ? Blocks.SHORT_GRASS.defaultBlockState()
-                            : random.nextInt(10) < 8 ? Blocks.FERN.defaultBlockState() : Blocks.DEAD_BUSH.defaultBlockState();
-                    if (foliage.canSurvive(level, placePos)) {
-                        setGeneratedBlock(level, placePos, foliage);
-                    }
+                    tryPlaceAmbientFoliage(level, random, placePos, supportPos, 0.7F, true);
                 }
             }
         }
@@ -718,8 +716,8 @@ public final class BaobabTreeGenerator {
                     continue;
                 }
                 setGeneratedBlock(level, placePos, ModBlocks.BAOBAB_LITTER.get().defaultBlockState()
-                        .setValue(PinkPetalsBlock.AMOUNT, 1 + random.nextInt(3))
-                        .setValue(PinkPetalsBlock.FACING, Direction.Plane.HORIZONTAL.getRandomDirection(random)));
+                        .setValue(BaobabLitterBlock.AMOUNT, 1 + random.nextInt(3))
+                        .setValue(BaobabLitterBlock.FACING, Direction.Plane.HORIZONTAL.getRandomDirection(random)));
             }
         }
     }
@@ -733,6 +731,103 @@ public final class BaobabTreeGenerator {
                 || state.is(Blocks.SAND)
                 || state.is(Blocks.RED_SAND)
                 || state.is(ModBlocks.TREE_ROOT.get());
+    }
+
+    private static boolean tryPlaceAmbientFoliage(WorldGenLevel level,
+                                                  RandomSource random,
+                                                  BlockPos placePos,
+                                                  BlockPos supportPos,
+                                                  float dryBias,
+                                                  boolean allowLeafLitter) {
+        if (!level.getBlockState(supportPos).isFaceSturdy(level, supportPos, Direction.UP)) {
+            return false;
+        }
+
+        BlockState supportState = level.getBlockState(supportPos);
+        if (!canSupportAmbientFoliage(supportState)) {
+            return false;
+        }
+        int roll = random.nextInt(100);
+        if (isSandySurface(supportState)) {
+            BlockState primary = roll < 36 ? Blocks.SHORT_DRY_GRASS.defaultBlockState()
+                    : roll < 62 ? Blocks.TALL_DRY_GRASS.defaultBlockState()
+                    : roll < 82 ? Blocks.DEAD_BUSH.defaultBlockState()
+                    : roll < 94 ? Blocks.BUSH.defaultBlockState()
+                    : allowLeafLitter ? createVanillaLeafLitterState(random) : Blocks.SHORT_DRY_GRASS.defaultBlockState();
+            return placeFirstSurviving(level, placePos,
+                    primary,
+                    Blocks.SHORT_DRY_GRASS.defaultBlockState(),
+                    Blocks.TALL_DRY_GRASS.defaultBlockState(),
+                    Blocks.DEAD_BUSH.defaultBlockState(),
+                    Blocks.BUSH.defaultBlockState());
+        }
+
+        boolean semiDry = supportState.is(Blocks.COARSE_DIRT) || supportState.is(Blocks.ROOTED_DIRT) || random.nextFloat() < dryBias;
+        if (semiDry) {
+            BlockState primary = roll < 24 ? Blocks.SHORT_DRY_GRASS.defaultBlockState()
+                    : roll < 40 ? Blocks.TALL_DRY_GRASS.defaultBlockState()
+                    : roll < 56 ? Blocks.BUSH.defaultBlockState()
+                    : roll < 68 ? Blocks.SHORT_GRASS.defaultBlockState()
+                    : roll < 80 ? Blocks.DEAD_BUSH.defaultBlockState()
+                    : roll < 92 ? createWildflowersState(random)
+                    : allowLeafLitter ? createVanillaLeafLitterState(random) : Blocks.SHORT_GRASS.defaultBlockState();
+            return placeFirstSurviving(level, placePos,
+                    primary,
+                    Blocks.SHORT_DRY_GRASS.defaultBlockState(),
+                    Blocks.BUSH.defaultBlockState(),
+                    Blocks.SHORT_GRASS.defaultBlockState(),
+                    Blocks.DEAD_BUSH.defaultBlockState(),
+                    createWildflowersState(random),
+                    allowLeafLitter ? createVanillaLeafLitterState(random) : Blocks.SHORT_GRASS.defaultBlockState());
+        }
+
+        BlockState primary = roll < 26 ? Blocks.SHORT_GRASS.defaultBlockState()
+                : roll < 42 ? Blocks.BUSH.defaultBlockState()
+                : roll < 58 ? createWildflowersState(random)
+                : roll < 70 ? Blocks.FERN.defaultBlockState()
+                : roll < 80 ? Blocks.SHORT_DRY_GRASS.defaultBlockState()
+                : roll < 88 ? Blocks.TALL_DRY_GRASS.defaultBlockState()
+                : roll < 94 ? allowLeafLitter ? createVanillaLeafLitterState(random) : Blocks.SHORT_GRASS.defaultBlockState()
+                : Blocks.DEAD_BUSH.defaultBlockState();
+        return placeFirstSurviving(level, placePos,
+                primary,
+                Blocks.SHORT_GRASS.defaultBlockState(),
+                Blocks.BUSH.defaultBlockState(),
+                createWildflowersState(random),
+                Blocks.FERN.defaultBlockState(),
+                Blocks.SHORT_DRY_GRASS.defaultBlockState(),
+                allowLeafLitter ? createVanillaLeafLitterState(random) : Blocks.SHORT_GRASS.defaultBlockState(),
+                Blocks.DEAD_BUSH.defaultBlockState());
+    }
+
+    private static boolean placeFirstSurviving(WorldGenLevel level, BlockPos placePos, BlockState... candidates) {
+        for (BlockState candidate : candidates) {
+            if (candidate.canSurvive(level, placePos)) {
+                setGeneratedBlock(level, placePos, candidate);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isSandySurface(BlockState supportState) {
+        return supportState.is(Blocks.SAND) || supportState.is(Blocks.RED_SAND);
+    }
+
+    private static boolean canSupportAmbientFoliage(BlockState supportState) {
+        return !supportState.is(ModBlocks.TREE_ROOT.get());
+    }
+
+    private static BlockState createWildflowersState(RandomSource random) {
+        return Blocks.WILDFLOWERS.defaultBlockState()
+                .setValue(FlowerBedBlock.FACING, Direction.Plane.HORIZONTAL.getRandomDirection(random))
+                .setValue(FlowerBedBlock.AMOUNT, 1 + random.nextInt(4));
+    }
+
+    private static BlockState createVanillaLeafLitterState(RandomSource random) {
+        return Blocks.LEAF_LITTER.defaultBlockState()
+                .setValue(LeafLitterBlock.FACING, Direction.Plane.HORIZONTAL.getRandomDirection(random))
+                .setValue(SegmentableBlock.AMOUNT, 1 + random.nextInt(4));
     }
 
     private static void shufflePositions(RandomSource random, List<BlockPos> positions) {
@@ -1146,8 +1241,8 @@ public final class BaobabTreeGenerator {
             };
             Direction facing = Direction.Plane.HORIZONTAL.getRandomDirection(random);
             BlockState litterState = de.artemis.baobabtree.common.block.BaobabLitterBlock.clearPodState(ModBlocks.BAOBAB_LITTER.get().defaultBlockState())
-                    .setValue(PinkPetalsBlock.AMOUNT, amount)
-                    .setValue(PinkPetalsBlock.FACING, facing);
+                    .setValue(BaobabLitterBlock.AMOUNT, amount)
+                    .setValue(BaobabLitterBlock.FACING, facing);
             if (random.nextFloat() < amount * 0.07F) {
                 float podRoll = random.nextFloat();
                 litterState = litterState.setValue(de.artemis.baobabtree.common.block.BaobabLitterBlock.HAS_SMALL, podRoll < 0.55F);
@@ -1160,24 +1255,7 @@ public final class BaobabTreeGenerator {
         }
 
         private void placeFoliage(BlockPos placePos, BlockPos supportPos) {
-            if (!level.getBlockState(supportPos).isFaceSturdy(level, supportPos, Direction.UP)) {
-                return;
-            }
-
-            BlockState supportState = level.getBlockState(supportPos);
-            BlockState foliageState;
-            if (supportState.is(Blocks.SAND) || supportState.is(Blocks.RED_SAND)) {
-                foliageState = Blocks.DEAD_BUSH.defaultBlockState();
-            } else {
-                int roll = random.nextInt(10);
-                foliageState = roll < 6 ? Blocks.SHORT_GRASS.defaultBlockState()
-                        : roll < 8 ? Blocks.FERN.defaultBlockState()
-                        : Blocks.DEAD_BUSH.defaultBlockState();
-            }
-
-            if (foliageState.canSurvive(level, placePos)) {
-                setGeneratedBlock(placePos, foliageState);
-            }
+            tryPlaceAmbientFoliage(level, random, placePos, supportPos, variant == Variant.ANCIENT ? 0.45F : 0.28F, true);
         }
 
         private void placeTrunk() {

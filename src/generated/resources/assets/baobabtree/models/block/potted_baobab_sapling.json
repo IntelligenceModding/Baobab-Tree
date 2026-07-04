@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/flower_pot_cross",
-  "textures": {
-    "dirt": "minecraft:block/dirt",
-    "flowerpot": "minecraft:block/flower_pot",
-    "plant": "baobabtree:block/baobab_sapling"
-  }
-}

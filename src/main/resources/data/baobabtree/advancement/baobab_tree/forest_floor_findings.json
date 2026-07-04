@@ -1,0 +1,29 @@
+{
+  "parent": "baobabtree:baobab_tree/root",
+  "display": {
+    "description": {
+      "translate": "advancements.baobabtree.forest_floor_findings.description"
+    },
+    "frame": "task",
+    "icon": {
+      "id": "baobabtree:baobab_litter"
+    },
+    "title": {
+      "translate": "advancements.baobabtree.forest_floor_findings.title"
+    },
+    "x": 2,
+    "y": 2
+  },
+  "criteria": {
+    "has_baobab_litter": {
+      "conditions": {
+        "items": [
+          {
+            "items": "baobabtree:baobab_litter"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  }
+}
