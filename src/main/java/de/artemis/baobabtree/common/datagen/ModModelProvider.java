@@ -33,7 +33,6 @@ import java.util.stream.Stream;
 public final class ModModelProvider extends ModelProvider {
     private static final int DEFAULT_FOLIAGE_TINT = -12012264;
     private static final Set<Block> CUSTOM_BLOCKSTATES = Set.of(
-            ModBlocks.BAOBAB_SHELF.get(),
             ModBlocks.BAOBAB_LITTER.get(),
             ModBlocks.BAOBAB_FRUIT_POD.get(),
             ModBlocks.SMALL_BAOBAB_FRUIT_POD.get(),
@@ -48,12 +47,10 @@ public final class ModModelProvider extends ModelProvider {
 
     private final PackOutput.PathProvider blockstatesPathProvider;
     private final PackOutput.PathProvider blockModelPathProvider;
-    private final PackOutput.PathProvider itemDefinitionPathProvider;
     public ModModelProvider(PackOutput output) {
         super(output, BaobabTree.MOD_ID);
         this.blockstatesPathProvider = output.createPathProvider(PackOutput.Target.RESOURCE_PACK, "blockstates");
         this.blockModelPathProvider = output.createPathProvider(PackOutput.Target.RESOURCE_PACK, "models/block");
-        this.itemDefinitionPathProvider = output.createPathProvider(PackOutput.Target.RESOURCE_PACK, "items");
     }
 
     @Override
@@ -75,13 +72,14 @@ public final class ModModelProvider extends ModelProvider {
                 .door(ModBlocks.BAOBAB_DOOR.get())
                 .fence(ModBlocks.BAOBAB_FENCE.get())
                 .fenceGate(ModBlocks.BAOBAB_FENCE_GATE.get())
+                .hangingSign(ModBlocks.BAOBAB_HANGING_SIGN.get(), ModBlocks.BAOBAB_WALL_HANGING_SIGN.get())
                 .pressurePlate(ModBlocks.BAOBAB_PRESSURE_PLATE.get())
                 .sign(ModBlocks.BAOBAB_SIGN.get(), ModBlocks.BAOBAB_WALL_SIGN.get())
                 .slab(ModBlocks.BAOBAB_SLAB.get())
                 .stairs(ModBlocks.BAOBAB_STAIRS.get())
                 .trapdoor(ModBlocks.BAOBAB_TRAPDOOR.get())
                 .getFamily());
-        blockModels.createHangingSign(ModBlocks.BAOBAB_PLANKS.get(), ModBlocks.BAOBAB_HANGING_SIGN.get(), ModBlocks.BAOBAB_WALL_HANGING_SIGN.get());
+        blockModels.createShelf(ModBlocks.BAOBAB_SHELF.get(), ModBlocks.STRIPPED_BAOBAB_LOG.get());
 
         blockModels.createTrivialBlock(ModBlocks.BAOBAB_LEAVES.get(), TexturedModel.LEAVES);
         blockModels.createPlantWithDefaultItem(ModBlocks.BAOBAB_SAPLING.get(), ModBlocks.POTTED_BAOBAB_SAPLING.get(), BlockModelGenerators.PlantType.NOT_TINTED);
@@ -119,7 +117,6 @@ public final class ModModelProvider extends ModelProvider {
         futures.add(saveBlockState(output, "small_baobab_fruit_pod", horizontalFacingBlockState("small_baobab_fruit_pod")));
         futures.add(saveBlockState(output, "medium_baobab_fruit_pod", horizontalFacingBlockState("medium_baobab_fruit_pod")));
         futures.add(saveBlockState(output, "large_baobab_fruit_pod", horizontalFacingBlockState("large_baobab_fruit_pod")));
-        futures.add(saveBlockState(output, "baobab_shelf", shelfBlockState()));
 
         futures.add(saveBlockModel(output, "baobab_fruit_pod_base", crossModel("baobab_fruit_pod_stage0")));
         futures.add(saveBlockModel(output, "baobab_fruit_pod_growth_stage1", podModel("1", 6.0, 7.0, 6.0, 10.0, 13.0, 10.0, 4.0, 6.0, 4.0)));
@@ -128,14 +125,6 @@ public final class ModModelProvider extends ModelProvider {
         futures.add(saveBlockModel(output, "small_baobab_fruit_pod", podModel("1", 6.0, 0.0, 6.0, 10.0, 6.0, 10.0, 4.0, 6.0, 4.0)));
         futures.add(saveBlockModel(output, "medium_baobab_fruit_pod", podModel("2", 4.0, 0.0, 4.0, 12.0, 10.0, 12.0, 8.0, 10.0, 8.0)));
         futures.add(saveBlockModel(output, "large_baobab_fruit_pod", podModel("3", 2.0, 0.0, 2.0, 14.0, 12.0, 14.0, 12.0, 12.0, 12.0)));
-        futures.add(saveBlockModel(output, "baobab_shelf", shelfModel("acacia_shelf")));
-        futures.add(saveBlockModel(output, "baobab_shelf_unpowered", shelfModel("acacia_shelf_unpowered")));
-        futures.add(saveBlockModel(output, "baobab_shelf_unconnected", shelfModel("acacia_shelf_unconnected")));
-        futures.add(saveBlockModel(output, "baobab_shelf_left", shelfModel("acacia_shelf_left")));
-        futures.add(saveBlockModel(output, "baobab_shelf_center", shelfModel("acacia_shelf_center")));
-        futures.add(saveBlockModel(output, "baobab_shelf_right", shelfModel("acacia_shelf_right")));
-        futures.add(saveBlockModel(output, "baobab_shelf_inventory", shelfModel("acacia_shelf_inventory")));
-        futures.add(saveItemDefinition(output, "baobab_shelf", shelfItemDefinition()));
 
         return CompletableFuture.allOf(futures.toArray(CompletableFuture[]::new));
     }
@@ -146,10 +135,6 @@ public final class ModModelProvider extends ModelProvider {
 
     private CompletableFuture<?> saveBlockModel(CachedOutput output, String name, JsonObject json) {
         return DataProvider.saveStable(output, json, blockModelPathProvider.json(id(name)));
-    }
-
-    private CompletableFuture<?> saveItemDefinition(CachedOutput output, String name, JsonObject json) {
-        return DataProvider.saveStable(output, json, itemDefinitionPathProvider.json(id(name)));
     }
 
     private static TextureMapping treeRootMapping() {
@@ -169,24 +154,6 @@ public final class ModModelProvider extends ModelProvider {
             for (int age = 1; age <= 3; age++) {
                 multipart.add(multipartEntry("baobab_fruit_pod_growth_stage" + age, rotation, age, facing));
             }
-        }
-
-        JsonObject root = new JsonObject();
-        root.add("multipart", multipart);
-        return root;
-    }
-
-    private static JsonObject shelfBlockState() {
-        JsonArray multipart = new JsonArray();
-
-        for (Direction facing : Direction.Plane.HORIZONTAL) {
-            int rotation = rotationFor(facing);
-            multipart.add(shelfMultipartEntry("baobab_shelf", rotation, facing, null, null));
-            multipart.add(shelfMultipartEntry("baobab_shelf_unpowered", rotation, facing, Boolean.FALSE, null));
-            multipart.add(shelfMultipartEntry("baobab_shelf_unconnected", rotation, facing, Boolean.TRUE, "unconnected"));
-            multipart.add(shelfMultipartEntry("baobab_shelf_left", rotation, facing, Boolean.TRUE, "left"));
-            multipart.add(shelfMultipartEntry("baobab_shelf_center", rotation, facing, Boolean.TRUE, "center"));
-            multipart.add(shelfMultipartEntry("baobab_shelf_right", rotation, facing, Boolean.TRUE, "right"));
         }
 
         JsonObject root = new JsonObject();
@@ -223,37 +190,6 @@ public final class ModModelProvider extends ModelProvider {
         JsonObject root = new JsonObject();
         root.add("variants", variants);
         return root;
-    }
-
-    private static JsonObject shelfMultipartEntry(String modelName,
-                                                  int yRotation,
-                                                  Direction facing,
-                                                  Boolean powered,
-                                                  String sideChainPart) {
-        JsonObject entry = new JsonObject();
-        JsonObject apply = new JsonObject();
-        apply.addProperty("model", modelId("block/" + modelName));
-        if (yRotation != 0) {
-            apply.addProperty("y", yRotation);
-        }
-        entry.add("apply", apply);
-
-        JsonObject when = new JsonObject();
-        if (powered == null && sideChainPart == null) {
-            when.addProperty("facing", facing.getSerializedName());
-        } else {
-            JsonArray and = new JsonArray();
-            and.add(propertyCondition("facing", facing.getSerializedName()));
-            if (powered != null) {
-                and.add(propertyCondition("powered", powered.toString()));
-            }
-            if (sideChainPart != null) {
-                and.add(propertyCondition("side_chain", sideChainPart));
-            }
-            when.add("AND", and);
-        }
-        entry.add("when", when);
-        return entry;
     }
 
     private static JsonObject multipartEntry(String modelName, int yRotation, int age, Direction facing) {
@@ -366,26 +302,6 @@ public final class ModModelProvider extends ModelProvider {
         uv.add(v1);
         face.add("uv", uv);
         return face;
-    }
-
-    private static JsonObject shelfModel(String parentModelName) {
-        JsonObject root = new JsonObject();
-        root.addProperty("parent", "minecraft:block/" + parentModelName);
-
-        JsonObject textures = new JsonObject();
-        textures.addProperty("all", modelId("block/baobab_shelf"));
-        textures.addProperty("particle", modelId("block/stripped_baobab_log"));
-        root.add("textures", textures);
-        return root;
-    }
-
-    private static JsonObject shelfItemDefinition() {
-        JsonObject root = new JsonObject();
-        JsonObject model = new JsonObject();
-        model.addProperty("type", "minecraft:model");
-        model.addProperty("model", modelId("block/baobab_shelf_inventory"));
-        root.add("model", model);
-        return root;
     }
 
     private static int rotationFor(Direction facing) {

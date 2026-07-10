@@ -7,13 +7,10 @@ import de.artemis.baobabtree.common.registry.ModBlockEntities;
 import de.artemis.baobabtree.common.registry.ModBlocks;
 import de.artemis.baobabtree.common.registry.ModEntityTypes;
 import de.artemis.baobabtree.common.registry.ModParticles;
-import de.artemis.baobabtree.common.registry.ModWoodTypes;
 import net.minecraft.client.model.object.boat.BoatModel;
 import net.minecraft.client.color.block.BlockTintSources;
-import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.HangingSignRenderer;
 import net.minecraft.client.renderer.blockentity.StandingSignRenderer;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
@@ -22,10 +19,6 @@ import java.util.List;
 
 public final class ClientModEvents {
     private ClientModEvents() {
-    }
-
-    public static void onClientSetup(FMLClientSetupEvent event) {
-        event.enqueueWork(() -> Sheets.addWoodType(ModWoodTypes.BAOBAB_WOOD_TYPE));
     }
 
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {

@@ -45,14 +45,7 @@ public class ModRecipeProvider extends RecipeProvider.Runner {
                 trapdoorBuilder(ModBlocks.BAOBAB_TRAPDOOR.get(), net.minecraft.world.item.crafting.Ingredient.of(ModBlocks.BAOBAB_PLANKS.get()))
                         .unlockedBy(getHasName(ModBlocks.BAOBAB_PLANKS.get()), has(ModBlocks.BAOBAB_PLANKS.get()))
                         .save(this.output);
-                ShapedRecipeBuilder.shaped(items, RecipeCategory.DECORATIONS, ModBlocks.BAOBAB_SHELF.get(), 6)
-                        .group("shelf")
-                        .pattern("###")
-                        .pattern("   ")
-                        .pattern("###")
-                        .define('#', ModBlocks.STRIPPED_BAOBAB_LOG.get())
-                        .unlockedBy(getHasName(ModBlocks.STRIPPED_BAOBAB_LOG.get()), has(ModBlocks.STRIPPED_BAOBAB_LOG.get()))
-                        .save(this.output);
+                shelf(ModBlocks.BAOBAB_SHELF.get(), ModBlocks.STRIPPED_BAOBAB_LOG.get());
                 buttonBuilder(ModBlocks.BAOBAB_BUTTON.get(), net.minecraft.world.item.crafting.Ingredient.of(ModBlocks.BAOBAB_PLANKS.get()))
                         .unlockedBy(getHasName(ModBlocks.BAOBAB_PLANKS.get()), has(ModBlocks.BAOBAB_PLANKS.get()))
                         .save(this.output);
@@ -60,20 +53,12 @@ public class ModRecipeProvider extends RecipeProvider.Runner {
                 signBuilder(ModItems.BAOBAB_SIGN.get(), net.minecraft.world.item.crafting.Ingredient.of(ModBlocks.BAOBAB_PLANKS.get()))
                         .unlockedBy(getHasName(ModBlocks.BAOBAB_PLANKS.get()), has(ModBlocks.BAOBAB_PLANKS.get()))
                         .save(this.output);
-                hangingSign(ModItems.BAOBAB_HANGING_SIGN.get(), ModBlocks.STRIPPED_BAOBAB_LOG.get());
-
-                ShapedRecipeBuilder.shaped(items, RecipeCategory.TRANSPORTATION, ModItems.BAOBAB_BOAT.get())
-                        .pattern("# #")
-                        .pattern("###")
-                        .define('#', ModBlocks.BAOBAB_PLANKS.get())
-                        .unlockedBy(getHasName(ModBlocks.BAOBAB_PLANKS.get()), has(ModBlocks.BAOBAB_PLANKS.get()))
+                hangingSignBuilder(ModItems.BAOBAB_HANGING_SIGN.get(), net.minecraft.world.item.crafting.Ingredient.of(ModBlocks.STRIPPED_BAOBAB_LOG.get()))
+                        .unlockedBy(getHasName(ModBlocks.STRIPPED_BAOBAB_LOG.get()), has(ModBlocks.STRIPPED_BAOBAB_LOG.get()))
                         .save(this.output);
 
-                ShapelessRecipeBuilder.shapeless(items, RecipeCategory.TRANSPORTATION, ModItems.BAOBAB_CHEST_BOAT.get())
-                        .requires(ModItems.BAOBAB_BOAT.get())
-                        .requires(Blocks.CHEST)
-                        .unlockedBy(getHasName(ModItems.BAOBAB_BOAT.get()), has(ModItems.BAOBAB_BOAT.get()))
-                        .save(this.output);
+                woodenBoat(ModItems.BAOBAB_BOAT.get(), ModBlocks.BAOBAB_PLANKS.get());
+                chestBoat(ModItems.BAOBAB_CHEST_BOAT.get(), ModItems.BAOBAB_BOAT.get());
 
                 ShapelessRecipeBuilder.shapeless(items, RecipeCategory.DECORATIONS, ModBlocks.BAOBAB_SAPLING.get())
                         .requires(ModItems.BAOBAB_FRUIT.get(), 4)

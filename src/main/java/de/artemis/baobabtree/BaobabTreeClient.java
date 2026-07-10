@@ -8,7 +8,6 @@ import net.neoforged.fml.common.Mod;
 @Mod(value = BaobabTree.MOD_ID, dist = Dist.CLIENT)
 public class BaobabTreeClient {
     public BaobabTreeClient(IEventBus modEventBus) {
-        modEventBus.addListener(ClientModEvents::onClientSetup);
         modEventBus.addListener(ClientModEvents::registerLayerDefinitions);
         modEventBus.addListener(ClientModEvents::registerEntityRenderers);
         modEventBus.addListener(ClientModEvents::registerBlockEntityRenderers);

@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
-      "model": "baobabtree:block/baobab_sign"
+    "facing=east": {
+      "model": "baobabtree:block/baobab_wall_sign",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "baobabtree:block/baobab_wall_sign",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "baobabtree:block/baobab_wall_sign"
+    },
+    "facing=west": {
+      "model": "baobabtree:block/baobab_wall_sign",
+      "y": 90
     }
   }
 }

@@ -31,6 +31,10 @@ public class BaobabSaplingBlock extends SaplingBlock {
 
         BlockPos anchor = findTwoByTwoAnchor(level, pos);
         if (anchor == null) {
+            level.removeBlock(pos, false);
+            if (!BaobabTreeGenerator.generateSapling(level, pos, random)) {
+                level.setBlock(pos, state, 4);
+            }
             return;
         }
 

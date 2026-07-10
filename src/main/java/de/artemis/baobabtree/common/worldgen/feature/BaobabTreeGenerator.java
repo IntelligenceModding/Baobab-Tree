@@ -8,7 +8,9 @@ import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.WorldGenLevel;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ColorCollection;
 import net.minecraft.world.level.block.DoublePlantBlock;
 import net.minecraft.world.level.block.FlowerBedBlock;
 import net.minecraft.world.level.block.LeafLitterBlock;
@@ -29,6 +31,8 @@ import java.util.Map;
 import java.util.Set;
 
 public final class BaobabTreeGenerator {
+    private static final ColorCollection<Block> DYED_TERRACOTTA = Blocks.DYED_TERRACOTTA;
+
     public enum Variant {
         YOUNG(11, 12, 2.2F, 1.9F, 1.35F, 5, 6, 5, 6, 1.0F, 6, 8, 3, 4, 0, 6, 2),
         MATURE(17, 18, 3.4F, 2.9F, 2.0F, 6, 7, 6, 7, 1.0F, 10, 12, 4, 5, 0, 10, 3),
@@ -136,12 +140,12 @@ public final class BaobabTreeGenerator {
     }
 
     private static boolean isValidGround(WorldGenLevel level, BlockPos origin, Variant variant) {
-        int sampleRadius = Mth.ceil(variant.baseRadius) + 2;
+        int sampleRadius = Math.max(2, Mth.ceil(variant.baseRadius) + 1);
         int minSurface = Integer.MAX_VALUE;
         int maxSurface = Integer.MIN_VALUE;
         int centerSurfaceY = level.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, origin.getX(), origin.getZ()) - 1;
 
-        if (centerSurfaceY != origin.getY() - 1) {
+        if (Math.abs(centerSurfaceY - (origin.getY() - 1)) > 1) {
             return false;
         }
 
@@ -163,17 +167,36 @@ public final class BaobabTreeGenerator {
             }
         }
 
-        return maxSurface - minSurface <= variant.maxSlope;
+        return maxSurface - minSurface <= Math.max(4, variant.maxSlope + 2);
     }
 
     private static boolean hasClearance(WorldGenLevel level, BlockPos origin, int trunkHeight, Variant variant) {
+        int trunkRadius = Math.max(2, Mth.ceil(variant.bodyRadius) + 1);
+        int canopyStart = Math.max(3, trunkHeight / 3);
+
+        for (int dx = -trunkRadius; dx <= trunkRadius; dx++) {
+            for (int dz = -trunkRadius; dz <= trunkRadius; dz++) {
+                if (dx * dx + dz * dz > trunkRadius * trunkRadius + 2) {
+                    continue;
+                }
+
+                for (int y = 0; y <= trunkHeight + 2; y++) {
+                    BlockPos pos = origin.offset(dx, y, dz);
+                    BlockState state = level.getBlockState(pos);
+                    if (!canReplace(state) && !state.is(BlockTags.LOGS) && !state.is(BlockTags.LEAVES)) {
+                        return false;
+                    }
+                }
+            }
+        }
+
         for (int dx = -variant.clearanceRadius; dx <= variant.clearanceRadius; dx++) {
             for (int dz = -variant.clearanceRadius; dz <= variant.clearanceRadius; dz++) {
                 if (dx * dx + dz * dz > variant.clearanceRadius * variant.clearanceRadius + 6) {
                     continue;
                 }
 
-                for (int y = 0; y <= trunkHeight + variant.maxLeafRadius + 6; y++) {
+                for (int y = canopyStart; y <= trunkHeight + variant.maxLeafRadius + 6; y++) {
                     BlockPos pos = origin.offset(dx, y, dz);
                     BlockState state = level.getBlockState(pos);
                     if (!canReplace(state) && !state.is(BlockTags.LOGS) && !state.is(BlockTags.LEAVES)) {
@@ -281,7 +304,7 @@ public final class BaobabTreeGenerator {
             int x = origin.getX() + direction.getStepX() * (step + 1);
             int z = origin.getZ() + direction.getStepZ() * (step + 1);
             int surfaceY = level.getHeight(Heightmap.Types.OCEAN_FLOOR_WG, x, z) - 1;
-            if (Math.abs(surfaceY - (origin.getY() - 1)) > Variant.FALLEN.maxSlope) {
+            if (Math.abs(surfaceY - (origin.getY() - 1)) > Variant.FALLEN.maxSlope + 2) {
                 return false;
             }
 
@@ -309,7 +332,7 @@ public final class BaobabTreeGenerator {
                 || state.is(Blocks.SAND)
                 || state.is(Blocks.RED_SAND)
                 || state.is(Blocks.TERRACOTTA)
-                || state.is(Blocks.ORANGE_TERRACOTTA);
+                || state.is(DYED_TERRACOTTA.orange());
     }
 
     private static boolean canReplace(BlockState state) {

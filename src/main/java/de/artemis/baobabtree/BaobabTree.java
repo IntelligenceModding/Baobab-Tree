@@ -1,6 +1,5 @@
 package de.artemis.baobabtree;
 
-import com.mojang.logging.LogUtils;
 import de.artemis.baobabtree.common.command.BaobabTreeCommands;
 import de.artemis.baobabtree.common.datagen.DataGenerators;
 import de.artemis.baobabtree.common.event.TreeRootClimbHandler;
@@ -11,22 +10,15 @@ import de.artemis.baobabtree.common.registry.ModEntityTypes;
 import de.artemis.baobabtree.common.registry.ModFeatures;
 import de.artemis.baobabtree.common.registry.ModItems;
 import de.artemis.baobabtree.common.registry.ModParticles;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.entity.BlockEntityTypes;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import org.slf4j.Logger;
-
-import java.lang.reflect.Field;
-import java.util.HashSet;
-import java.util.Set;
+import net.neoforged.neoforge.event.BlockEntityTypeAddBlocksEvent;
 
 @Mod(BaobabTree.MOD_ID)
 public class BaobabTree {
     public static final String MOD_ID = "baobabtree";
-    private static final Logger LOGGER = LogUtils.getLogger();
 
     public BaobabTree(IEventBus modEventBus) {
         ModItems.register(modEventBus);
@@ -38,28 +30,12 @@ public class BaobabTree {
         ModCreativeModeTabs.register(modEventBus);
         modEventBus.addListener(DataGenerators::gatherClientData);
         modEventBus.addListener(DataGenerators::gatherServerData);
-        modEventBus.addListener(this::onCommonSetup);
+        modEventBus.addListener(BaobabTree::onBlockEntityTypeAddBlocks);
         NeoForge.EVENT_BUS.addListener(BaobabTreeCommands::register);
         NeoForge.EVENT_BUS.addListener(TreeRootClimbHandler::onPlayerTick);
     }
 
-    private void onCommonSetup(FMLCommonSetupEvent event) {
-        event.enqueueWork(() -> addShelfBlockToVanillaShelfType(ModBlocks.BAOBAB_SHELF.get()));
-    }
-
-    @SuppressWarnings("unchecked")
-    private static void addShelfBlockToVanillaShelfType(Block shelfBlock) {
-        try {
-            Field validBlocksField = BlockEntityType.class.getDeclaredField("validBlocks");
-            validBlocksField.setAccessible(true);
-
-            Set<Block> validBlocks = new HashSet<>((Set<Block>) validBlocksField.get(BlockEntityType.SHELF));
-            if (validBlocks.add(shelfBlock)) {
-                validBlocksField.set(BlockEntityType.SHELF, Set.copyOf(validBlocks));
-            }
-        } catch (ReflectiveOperationException exception) {
-            LOGGER.error("Failed to register {} with the vanilla shelf block entity type", shelfBlock, exception);
-            throw new IllegalStateException("Unable to extend the vanilla shelf block entity type", exception);
-        }
+    private static void onBlockEntityTypeAddBlocks(BlockEntityTypeAddBlocksEvent event) {
+        event.modify(BlockEntityTypes.SHELF, ModBlocks.BAOBAB_SHELF.get());
     }
 }

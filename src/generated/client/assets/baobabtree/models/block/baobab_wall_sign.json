@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/template_wall_sign",
+  "textures": {
+    "all": "baobabtree:block/baobab_sign",
+    "particle": "baobabtree:block/baobab_planks"
+  }
+}

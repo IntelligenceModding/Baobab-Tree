@@ -1,5 +1,5 @@
 {
-  "parent": "minecraft:block/acacia_shelf_unconnected",
+  "parent": "minecraft:block/template_shelf_unconnected",
   "textures": {
     "all": "baobabtree:block/baobab_shelf",
     "particle": "baobabtree:block/stripped_baobab_log"
