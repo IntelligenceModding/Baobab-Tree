@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 
 public final class ModModelProvider extends ModelProvider {
     private static final int DEFAULT_FOLIAGE_TINT = -12012264;
+    private static final int DEFAULT_ACACIA_FOLIAGE_TINT = -5331926;
     private static final Set<Block> CUSTOM_BLOCKSTATES = Set.of(
             ModBlocks.BAOBAB_SHELF.get(),
             ModBlocks.BAOBAB_LITTER.get(),
@@ -99,7 +100,7 @@ public final class ModModelProvider extends ModelProvider {
         Identifier litterItemModel = itemModels.createFlatItemModel(ModBlocks.BAOBAB_LITTER.get().asItem(), ModelTemplates.FLAT_ITEM);
         itemModels.itemModelOutput.accept(
                 ModBlocks.BAOBAB_LITTER.get().asItem(),
-                ItemModelUtils.tintedModel(litterItemModel, foliageTint())
+                ItemModelUtils.tintedModel(litterItemModel, acaciaFoliageTint())
         );
         itemModels.generateFlatItem(ModItems.BAOBAB_BOAT.get(), ModelTemplates.FLAT_ITEM);
         itemModels.generateFlatItem(ModItems.BAOBAB_CHEST_BOAT.get(), ModelTemplates.FLAT_ITEM);
@@ -411,5 +412,9 @@ public final class ModModelProvider extends ModelProvider {
 
     private static ItemTintSource foliageTint() {
         return ItemModelUtils.constantTint(DEFAULT_FOLIAGE_TINT);
+    }
+
+    private static ItemTintSource acaciaFoliageTint() {
+        return ItemModelUtils.constantTint(DEFAULT_ACACIA_FOLIAGE_TINT);
     }
 }

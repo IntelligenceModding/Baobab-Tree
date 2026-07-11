@@ -11,8 +11,10 @@ import net.minecraft.world.level.WorldGenLevel;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoublePlantBlock;
 import net.minecraft.world.level.block.FlowerBedBlock;
+import net.minecraft.world.level.block.GrowingPlantHeadBlock;
 import net.minecraft.world.level.block.LeafLitterBlock;
 import net.minecraft.world.level.block.LeavesBlock;
+import net.minecraft.world.level.block.MultifaceBlock;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.SegmentableBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -132,6 +134,9 @@ public final class BaobabTreeGenerator {
         if (withGroundDecoration) {
             state.placeGroundCover();
         }
+        state.fillAncientHollowWithWater();
+        state.placeAncientGlowLichen();
+        state.placeAncientGlowBerries();
         return true;
     }
 
@@ -1330,6 +1335,257 @@ public final class BaobabTreeGenerator {
             }
         }
 
+        private void fillAncientHollowWithWater() {
+            if (variant != Variant.ANCIENT || random.nextFloat() >= 0.5F) {
+                return;
+            }
+
+            int waterDepth = Math.min(trunkHeight, Mth.nextInt(random, 3, 10));
+            for (int y = 0; y < waterDepth; y++) {
+                float t = y / (float) Math.max(1, trunkHeight - 1);
+                float outerRadius = radiusAtHeight(t);
+                float hollowRadius = Math.max(1.35F, outerRadius - 1.45F);
+                fillCircularLayer(origin.getY() + y, hollowRadius, Blocks.WATER.defaultBlockState());
+            }
+        }
+
+        private void placeAncientGlowLichen() {
+            if (variant != Variant.ANCIENT) {
+                return;
+            }
+
+            int bandCount = 3 + random.nextInt(3);
+            double angleOffset = random.nextDouble() * Mth.TWO_PI;
+            double[] bandAngles = new double[bandCount];
+            for (int i = 0; i < bandCount; i++) {
+                bandAngles[i] = angleOffset + i * (Mth.TWO_PI / bandCount) + (random.nextDouble() - 0.5D) * 0.45D;
+            }
+
+            for (int y = 1; y < trunkHeight; y++) {
+                float t = y / (float) Math.max(1, trunkHeight - 1);
+                float outerRadius = radiusAtHeight(t);
+                float hollowRadius = Math.max(1.35F, outerRadius - 1.45F);
+                int extent = Mth.ceil(hollowRadius);
+
+                for (int dx = -extent; dx <= extent; dx++) {
+                    for (int dz = -extent; dz <= extent; dz++) {
+                        double distance = Math.sqrt(dx * dx + dz * dz);
+                        if (distance > hollowRadius) {
+                            continue;
+                        }
+
+                        BlockPos pos = origin.offset(dx, y, dz);
+                        List<Direction> faces = getLichenFaces(pos);
+                        if (faces.isEmpty()) {
+                            continue;
+                        }
+
+                        double angle = Math.atan2(dz + 0.15D, dx + 0.15D);
+                        float bandInfluence = 0.0F;
+                        for (double bandAngle : bandAngles) {
+                            double difference = smallestAngleDifference(angle, bandAngle);
+                            bandInfluence = Math.max(bandInfluence, (float) Math.max(0.0D, 1.0D - difference / 0.75D));
+                        }
+
+                        float verticalWave = 0.5F + 0.5F * Mth.sin((float) (y * 0.55D + angle * 1.8D));
+                        float edgeBias = Mth.clamp((float) ((distance - (hollowRadius - 1.1D)) / 1.1D), 0.0F, 1.0F);
+                        float chance = 0.06F + bandInfluence * 0.32F + verticalWave * 0.12F + edgeBias * 0.14F;
+                        if (faces.contains(Direction.UP)) {
+                            chance *= 0.82F;
+                        }
+
+                        if (random.nextFloat() >= chance) {
+                            continue;
+                        }
+
+                        Direction primaryFace = faces.get(random.nextInt(faces.size()));
+                        placeGlowLichen(pos, primaryFace);
+
+                        if (faces.size() > 1 && random.nextFloat() < 0.18F + bandInfluence * 0.16F) {
+                            Direction secondaryFace = faces.get(random.nextInt(faces.size()));
+                            if (secondaryFace != primaryFace) {
+                                placeGlowLichen(pos, secondaryFace);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        private void placeAncientGlowBerries() {
+            if (variant != Variant.ANCIENT) {
+                return;
+            }
+
+            List<GlowBerryCandidate> candidates = new ArrayList<>();
+            int minY = Math.max(3, Mth.floor(trunkHeight * 0.22F));
+            int maxY = Math.max(minY, trunkHeight - 4);
+            for (int y = minY; y <= maxY; y++) {
+                float t = y / (float) Math.max(1, trunkHeight - 1);
+                float hollowRadius = Math.max(1.35F, radiusAtHeight(t) - 1.45F);
+                int extent = Mth.ceil(hollowRadius);
+
+                for (int dx = -extent; dx <= extent; dx++) {
+                    for (int dz = -extent; dz <= extent; dz++) {
+                        double distance = Math.sqrt(dx * dx + dz * dz);
+                        if (distance > hollowRadius || distance < Math.max(0.55D, hollowRadius - 1.35D)) {
+                            continue;
+                        }
+
+                        BlockPos pos = origin.offset(dx, y, dz);
+                        if (!level.getBlockState(pos).isAir()) {
+                            continue;
+                        }
+                        if (!level.getBlockState(pos.above()).is(ModBlocks.BAOBAB_WOOD.get())) {
+                            continue;
+                        }
+                        if (!level.getBlockState(pos.below()).isAir()) {
+                            continue;
+                        }
+                        if (level.getBlockState(pos.above(2)).is(ModBlocks.BAOBAB_WOOD.get()) && random.nextFloat() < 0.65F) {
+                            continue;
+                        }
+
+                        int maxLength = maxGlowBerryLength(pos, 3);
+                        if (maxLength <= 0) {
+                            continue;
+                        }
+
+                        candidates.add(new GlowBerryCandidate(pos.immutable(), maxLength));
+                    }
+                }
+            }
+
+            if (candidates.isEmpty()) {
+                return;
+            }
+
+            shuffleGlowBerryCandidates(candidates);
+            int targetCount = 1 + random.nextInt(3);
+            int placed = 0;
+            for (GlowBerryCandidate candidate : candidates) {
+                if (placed >= targetCount) {
+                    break;
+                }
+
+                int length = candidate.maxLength() == 1 ? 1 : 2 + random.nextInt(candidate.maxLength() - 1);
+                if (!canPlaceGlowBerryVine(candidate.startPos(), length)) {
+                    continue;
+                }
+
+                placeGlowBerryVine(candidate.startPos(), length);
+                placed++;
+            }
+        }
+
+        private int maxGlowBerryLength(BlockPos startPos, int maxLength) {
+            int length = 0;
+            while (length < maxLength && level.getBlockState(startPos.below(length)).isAir()) {
+                length++;
+            }
+            return length;
+        }
+
+        private boolean canPlaceGlowBerryVine(BlockPos startPos, int length) {
+            if (!level.getBlockState(startPos.above()).is(ModBlocks.BAOBAB_WOOD.get())) {
+                return false;
+            }
+
+            for (int offset = 0; offset < length; offset++) {
+                if (!level.getBlockState(startPos.below(offset)).isAir()) {
+                    return false;
+                }
+            }
+
+            if (length > 1) {
+                return true;
+            }
+
+            BlockPos headPos = startPos.below(length - 1);
+            BlockState headState = Blocks.CAVE_VINES.defaultBlockState()
+                    .setValue(GrowingPlantHeadBlock.AGE, GrowingPlantHeadBlock.MAX_AGE)
+                    .setValue(net.minecraft.world.level.block.CaveVines.BERRIES, false);
+            return headState.canSurvive(level, headPos);
+        }
+
+        private void placeGlowBerryVine(BlockPos startPos, int length) {
+            for (int offset = 0; offset < length - 1; offset++) {
+                BlockPos bodyPos = startPos.below(offset);
+                BlockState bodyState = Blocks.CAVE_VINES_PLANT.defaultBlockState()
+                        .setValue(net.minecraft.world.level.block.CaveVines.BERRIES, random.nextFloat() < 0.3F);
+                setGeneratedBlock(bodyPos, bodyState);
+            }
+
+            BlockPos headPos = startPos.below(length - 1);
+            BlockState headState = Blocks.CAVE_VINES.defaultBlockState()
+                    .setValue(GrowingPlantHeadBlock.AGE, GrowingPlantHeadBlock.MAX_AGE)
+                    .setValue(net.minecraft.world.level.block.CaveVines.BERRIES, random.nextFloat() < 0.7F);
+            setGeneratedBlock(headPos, headState);
+        }
+
+        private void shuffleGlowBerryCandidates(List<GlowBerryCandidate> candidates) {
+            for (int i = candidates.size() - 1; i > 0; i--) {
+                int swapIndex = random.nextInt(i + 1);
+                GlowBerryCandidate tmp = candidates.get(i);
+                candidates.set(i, candidates.get(swapIndex));
+                candidates.set(swapIndex, tmp);
+            }
+        }
+
+        private void fillCircularLayer(int worldY, float radius, BlockState fillState) {
+            int extent = Mth.ceil(radius);
+            for (int dx = -extent; dx <= extent; dx++) {
+                for (int dz = -extent; dz <= extent; dz++) {
+                    double distance = Math.sqrt(dx * dx + dz * dz);
+                    if (distance > radius) {
+                        continue;
+                    }
+
+                    BlockPos pos = origin.offset(dx, worldY - origin.getY(), dz);
+                    BlockState existingState = level.getBlockState(pos);
+                    if (!existingState.isAir() && !existingState.canBeReplaced()) {
+                        continue;
+                    }
+
+                    setGeneratedBlock(pos, fillState);
+                }
+            }
+        }
+
+        private List<Direction> getLichenFaces(BlockPos pos) {
+            BlockState existingState = level.getBlockState(pos);
+            if (!existingState.isAir() && !existingState.is(Blocks.WATER) && !existingState.is(Blocks.GLOW_LICHEN)) {
+                return List.of();
+            }
+
+            List<Direction> faces = new ArrayList<>(5);
+            for (Direction direction : Direction.Plane.HORIZONTAL) {
+                if (level.getBlockState(pos.relative(direction)).is(ModBlocks.BAOBAB_WOOD.get())) {
+                    faces.add(direction);
+                }
+            }
+            if (level.getBlockState(pos.above()).is(ModBlocks.BAOBAB_WOOD.get())) {
+                faces.add(Direction.UP);
+            }
+
+            return faces;
+        }
+
+        private void placeGlowLichen(BlockPos pos, Direction face) {
+            BlockState oldState = level.getBlockState(pos);
+            BlockState lichenState = ((MultifaceBlock) Blocks.GLOW_LICHEN).getStateForPlacement(oldState, level, pos, face);
+            if (lichenState == null || !lichenState.canSurvive(level, pos)) {
+                return;
+            }
+
+            setGeneratedBlock(pos, lichenState);
+        }
+
+        private double smallestAngleDifference(double first, double second) {
+            double difference = Math.abs(first - second) % Mth.TWO_PI;
+            return difference > Math.PI ? Mth.TWO_PI - difference : difference;
+        }
+
         private void placeBranches() {
             double startAngle = random.nextDouble() * Mth.TWO_PI;
             int branchStartBase = Mth.floor(trunkHeight * (variant == Variant.YOUNG ? 0.76F : 0.74F));
@@ -1714,5 +1970,8 @@ public final class BaobabTreeGenerator {
     }
 
     private record LeafPadSeed(BlockPos tip, double angle, int radius) {
+    }
+
+    private record GlowBerryCandidate(BlockPos startPos, int maxLength) {
     }
 }
