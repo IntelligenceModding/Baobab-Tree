@@ -19,6 +19,8 @@ import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 
 public final class ClientModEvents {
+    private static final int DEFAULT_ACACIA_FOLIAGE_TINT = -5331926;
+
     private ClientModEvents() {
     }
 
@@ -54,7 +56,8 @@ public final class ClientModEvents {
 
     public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
         event.register((stack, tintIndex) -> tintIndex == 0 ? FoliageColor.getDefaultColor() : -1,
-                ModBlocks.BAOBAB_LEAVES.get(),
+                ModBlocks.BAOBAB_LEAVES.get());
+        event.register((stack, tintIndex) -> tintIndex == 0 ? DEFAULT_ACACIA_FOLIAGE_TINT : -1,
                 ModBlocks.BAOBAB_LITTER.get());
     }
 }

@@ -6,6 +6,8 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.SpriteSet;
 import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.client.renderer.BiomeColors;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.SimpleParticleType;
 import org.jetbrains.annotations.NotNull;
 
@@ -39,6 +41,12 @@ public class BaobabLitterFluffParticle extends TextureSheetParticle {
         this.swirlPhase = random.nextFloat() * ((float) Math.PI * 2.0F);
         this.roll = random.nextFloat() * ((float) Math.PI * 2.0F);
         this.oRoll = this.roll;
+
+        int tint = BiomeColors.getAverageFoliageColor(level, BlockPos.containing(x, y, z));
+        float red = ((tint >> 16) & 0xFF) / 255.0F;
+        float green = ((tint >> 8) & 0xFF) / 255.0F;
+        float blue = (tint & 0xFF) / 255.0F;
+        this.setColor(red, green, blue);
 
         this.setSpriteFromAge(spriteSet);
     }
