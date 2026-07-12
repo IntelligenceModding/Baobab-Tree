@@ -51,6 +51,6 @@ public class BaobabFruitItem extends Item {
 
         SoundType soundType = podState.getSoundType(level, podPos, player);
         level.playSound(player, podPos, soundType.getPlaceSound(), SoundSource.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F);
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER;
     }
 }

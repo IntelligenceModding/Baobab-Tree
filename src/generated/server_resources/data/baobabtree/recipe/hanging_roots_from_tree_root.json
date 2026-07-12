@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "baobabtree:tree_root"
+  ],
+  "result": {
+    "count": 1,
+    "id": "minecraft:hanging_roots"
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "parent": "minecraft:block/block",
+  "elements": [
+    {
+      "faces": {
+        "down": {
+          "texture": "#end",
+          "uv": [
+            8,
+            8,
+            0,
+            0
+          ]
+        },
+        "east": {
+          "texture": "#side",
+          "uv": [
+            0,
+            0,
+            8,
+            10
+          ]
+        },
+        "north": {
+          "texture": "#side",
+          "uv": [
+            0,
+            0,
+            8,
+            10
+          ]
+        },
+        "south": {
+          "texture": "#side",
+          "uv": [
+            0,
+            0,
+            8,
+            10
+          ]
+        },
+        "up": {
+          "texture": "#end",
+          "uv": [
+            0,
+            0,
+            8,
+            8
+          ]
+        },
+        "west": {
+          "texture": "#side",
+          "uv": [
+            0,
+            0,
+            8,
+            10
+          ]
+        }
+      },
+      "from": [
+        4,
+        0,
+        4
+      ],
+      "to": [
+        12,
+        10,
+        12
+      ]
+    }
+  ],
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "end": "baobabtree:block/baobab_fruit_pod_top_stage2",
+    "particle": "baobabtree:block/baobab_fruit_pod_side_stage2",
+    "side": "baobabtree:block/baobab_fruit_pod_side_stage2"
+  }
+}

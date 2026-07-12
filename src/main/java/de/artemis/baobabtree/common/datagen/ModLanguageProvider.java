@@ -37,6 +37,8 @@ public class ModLanguageProvider extends net.neoforged.neoforge.common.data.Lang
         add(ModBlocks.SMALL_BAOBAB_FRUIT_POD.get(), "Small Baobab Fruit Pod");
         add(ModBlocks.MEDIUM_BAOBAB_FRUIT_POD.get(), "Medium Baobab Fruit Pod");
         add(ModBlocks.LARGE_BAOBAB_FRUIT_POD.get(), "Large Baobab Fruit Pod");
+        add(ModItems.BAOBAB_SIGN.get(), "Baobab Sign");
+        add(ModItems.BAOBAB_HANGING_SIGN.get(), "Baobab Hanging Sign");
         add(ModItems.BAOBAB_FRUIT.get(), "Baobab Fruit");
         add(ModItems.BAOBAB_BOAT.get(), "Baobab Boat");
         add(ModItems.BAOBAB_CHEST_BOAT.get(), "Baobab Boat with Chest");

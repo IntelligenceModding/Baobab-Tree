@@ -29,6 +29,9 @@ base {
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
+def generatedServerResources = file('src/generated/server_resources')
+def generatedClientResources = file('src/generated/client_resources')
+
 neoForge {
     version = project.neo_version
 
@@ -54,11 +57,19 @@ neoForge {
             systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         }
 
-        data {
-            data()
+        clientData {
+            clientData()
             programArguments.addAll '--mod', project.mod_id,
                     '--all',
-                    '--output', file('src/generated/resources/').getAbsolutePath(),
+                    '--output', generatedClientResources.getAbsolutePath(),
+                    '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+
+        serverData {
+            serverData()
+            programArguments.addAll '--mod', project.mod_id,
+                    '--all',
+                    '--output', generatedServerResources.getAbsolutePath(),
                     '--existing', file('src/main/resources/').getAbsolutePath()
         }
 
@@ -76,7 +87,9 @@ neoForge {
 }
 
 sourceSets.main.resources {
-    srcDir 'src/generated/resources'
+    srcDir generatedServerResources
+    srcDir generatedClientResources
+    exclude '.cache/**'
 }
 
 configurations {
@@ -114,8 +127,9 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
 }
 
-tasks.register('runClientData') {
-    dependsOn tasks.named('runData')
+tasks.register('runData') {
+    dependsOn tasks.named('runClientData')
+    dependsOn tasks.named('runServerData')
 }
 
 publishing {

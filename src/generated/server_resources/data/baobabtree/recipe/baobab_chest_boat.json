@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "baobabtree:baobab_boat",
+    "minecraft:chest"
+  ],
+  "result": {
+    "count": 1,
+    "id": "baobabtree:baobab_chest_boat"
+  }
+}

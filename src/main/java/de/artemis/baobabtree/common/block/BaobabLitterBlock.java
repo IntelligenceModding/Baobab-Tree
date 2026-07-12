@@ -9,14 +9,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
@@ -80,33 +79,31 @@ public class BaobabLitterBlock extends PinkPetalsBlock implements EntityBlock {
     }
 
     @Override
-    protected @NotNull ItemInteractionResult useItemOn(@NotNull ItemStack stack,
-                                                       @NotNull BlockState state,
-                                                       @NotNull Level level,
-                                                       @NotNull BlockPos pos,
-                                                       @NotNull Player player,
-                                                       @NotNull InteractionHand hand,
-                                                       @NotNull BlockHitResult hitResult) {
+    protected @NotNull InteractionResult useItemOn(@NotNull ItemStack stack,
+                                                   @NotNull BlockState state,
+                                                   @NotNull Level level,
+                                                   @NotNull BlockPos pos,
+                                                   @NotNull Player player,
+                                                   @NotNull InteractionHand hand,
+                                                   @NotNull BlockHitResult hitResult) {
         if (stack.isEmpty()) {
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
 
         if (stack.canPerformAction(ItemAbilities.PICKAXE_DIG)) {
             if (!level.isClientSide()) {
                 harvestOneLayer(level, pos, state);
-                level.playSound(null, pos, SoundEvents.GRASS_BREAK, SoundSource.BLOCKS, 0.75F, 0.95F + level.random.nextFloat() * 0.1F);
+                level.playSound(null, pos, SoundEvents.GRASS_BREAK, SoundSource.BLOCKS, 0.75F, 0.95F + level.getRandom().nextFloat() * 0.1F);
             }
-            return ItemInteractionResult.sidedSuccess(level.isClientSide());
+            return level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER;
         }
 
         InteractionResult itemUseResult = stack.useOn(new UseOnContext(player, hand, hitResult));
-        if (itemUseResult == InteractionResult.PASS) {
+        if (itemUseResult == InteractionResult.PASS || itemUseResult == InteractionResult.TRY_WITH_EMPTY_HAND) {
             return rummageAndRemoveWithItem(state, level, pos, player);
         }
 
-        return itemUseResult.consumesAction()
-                ? ItemInteractionResult.sidedSuccess(level.isClientSide())
-                : ItemInteractionResult.FAIL;
+        return itemUseResult;
     }
 
     @Override
@@ -126,17 +123,17 @@ public class BaobabLitterBlock extends PinkPetalsBlock implements EntityBlock {
         int amountBefore = state.getValue(AMOUNT);
         rummage((ServerLevel) level, pos, state, player, amountBefore);
         level.removeBlock(pos, false);
-        level.playSound(null, pos, SoundEvents.GRASS_BREAK, SoundSource.BLOCKS, 0.75F, 0.9F + level.random.nextFloat() * 0.2F);
+        level.playSound(null, pos, SoundEvents.GRASS_BREAK, SoundSource.BLOCKS, 0.75F, 0.9F + level.getRandom().nextFloat() * 0.2F);
         return InteractionResult.CONSUME;
     }
 
-    private ItemInteractionResult rummageAndRemoveWithItem(BlockState state, Level level, BlockPos pos, Player player) {
+    private InteractionResult rummageAndRemoveWithItem(BlockState state, Level level, BlockPos pos, Player player) {
         rummageAndRemove(state, level, pos, player);
-        return ItemInteractionResult.sidedSuccess(level.isClientSide());
+        return level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER;
     }
 
     private void rummage(ServerLevel level, BlockPos pos, BlockState state, Player player, int amountBefore) {
-        RandomSource random = level.random;
+        RandomSource random = level.getRandom();
         Block podBlock = podBlockForState(state);
         if (podBlock != null) {
             giveToPlayerOrDrop(level, pos, player, new ItemStack(podBlock));

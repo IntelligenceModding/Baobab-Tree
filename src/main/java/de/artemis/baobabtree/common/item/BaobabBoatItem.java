@@ -4,7 +4,7 @@ import de.artemis.baobabtree.common.entity.BaobabBoatEntity;
 import de.artemis.baobabtree.common.entity.BaobabChestBoatEntity;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -22,15 +22,15 @@ public class BaobabBoatItem extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+    public InteractionResult use(Level level, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         BlockHitResult hit = getPlayerPOVHitResult(level, player, ClipContext.Fluid.ANY);
 
         if (hit.getType() != HitResult.Type.BLOCK) {
-            return InteractionResultHolder.pass(stack);
+            return InteractionResult.PASS;
         }
 
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             double x = hit.getLocation().x;
             double y = hit.getLocation().y;
             double z = hit.getLocation().z;
@@ -51,6 +51,6 @@ public class BaobabBoatItem extends Item {
         }
 
         player.awardStat(Stats.ITEM_USED.get(this));
-        return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+        return level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER;
     }
 }

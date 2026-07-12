@@ -27,7 +27,8 @@ public class BaobabTree {
         ModFeatures.register(modEventBus);
         ModParticles.register(modEventBus);
         ModCreativeModeTabs.register(modEventBus);
-        modEventBus.addListener(DataGenerators::gatherData);
+        modEventBus.addListener(DataGenerators::gatherClientData);
+        modEventBus.addListener(DataGenerators::gatherServerData);
         NeoForge.EVENT_BUS.addListener(BaobabTreeCommands::register);
         NeoForge.EVENT_BUS.addListener(TreeRootClimbHandler::onPlayerTick);
         NeoForge.EVENT_BUS.addListener(ModVillagerTradeHandler::onWandererTrades);

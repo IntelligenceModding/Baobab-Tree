@@ -101,7 +101,7 @@ public final class BaobabTreeGenerator {
     }
 
     private static boolean generate(WorldGenLevel level, BlockPos origin, RandomSource random, Variant variant, boolean withGroundDecoration) {
-        if (origin.getY() <= level.getMinBuildHeight() + 1) {
+        if (origin.getY() <= level.getMinY() + 1) {
             return false;
         }
 
@@ -185,7 +185,7 @@ public final class BaobabTreeGenerator {
             }
         }
 
-        return origin.getY() + trunkHeight + variant.maxLeafRadius + 6 < level.getMaxBuildHeight();
+        return origin.getY() + trunkHeight + variant.maxLeafRadius + 6 < level.getMaxY();
     }
 
     private static boolean generateFallen(WorldGenLevel level, BlockPos origin, RandomSource random, boolean withGroundDecoration) {
@@ -301,7 +301,7 @@ public final class BaobabTreeGenerator {
             }
         }
 
-        return origin.getY() + stumpHeight + 8 < level.getMaxBuildHeight();
+        return origin.getY() + stumpHeight + 8 < level.getMaxY();
     }
 
     private static boolean isAllowedSoil(BlockState state) {

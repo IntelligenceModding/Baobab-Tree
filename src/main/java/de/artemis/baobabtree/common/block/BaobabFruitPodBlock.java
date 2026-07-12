@@ -10,24 +10,23 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.Fallable;
-import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -38,7 +37,7 @@ import org.jetbrains.annotations.Nullable;
 public class BaobabFruitPodBlock extends Block implements BonemealableBlock {
     public static final MapCodec<BaobabFruitPodBlock> CODEC = simpleCodec(BaobabFruitPodBlock::new);
     public static final IntegerProperty AGE = BlockStateProperties.AGE_3;
-    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     private static final int RIPE_FALL_MIN_DELAY_TICKS = 30 * 20;
     private static final int RIPE_FALL_MAX_DELAY_TICKS = 180 * 20;
 
@@ -78,11 +77,13 @@ public class BaobabFruitPodBlock extends Block implements BonemealableBlock {
 
     @Override
     protected @NotNull BlockState updateShape(@NotNull BlockState state,
-                                              @NotNull Direction direction,
-                                              @NotNull BlockState neighborState,
-                                              @NotNull LevelAccessor level,
+                                              @NotNull LevelReader level,
+                                              @NotNull ScheduledTickAccess ticks,
                                               @NotNull BlockPos pos,
-                                              @NotNull BlockPos neighborPos) {
+                                              @NotNull Direction direction,
+                                              @NotNull BlockPos neighborPos,
+                                              @NotNull BlockState neighborState,
+                                              @NotNull RandomSource random) {
         if (direction == Direction.UP && !state.canSurvive(level, pos)) {
             if (level instanceof ServerLevel serverLevel) {
                 dropFromBrokenSupport(serverLevel, pos, state);
@@ -90,7 +91,7 @@ public class BaobabFruitPodBlock extends Block implements BonemealableBlock {
             return Blocks.AIR.defaultBlockState();
         }
 
-        return super.updateShape(state, direction, neighborState, level, pos, neighborPos);
+        return super.updateShape(state, level, ticks, pos, direction, neighborPos, neighborState, random);
     }
 
     @Override
@@ -174,13 +175,13 @@ public class BaobabFruitPodBlock extends Block implements BonemealableBlock {
             return InteractionResult.PASS;
         }
 
-        if (!level.isClientSide) {
+        if (!level.isClientSide()) {
             giveToPlayerOrDrop(level, pos, player, new ItemStack(podItemForAge(age)));
             level.setBlock(pos, state.setValue(AGE, 0), Block.UPDATE_CLIENTS);
-            level.playSound(null, pos, SoundEvents.CAVE_VINES_PICK_BERRIES, SoundSource.BLOCKS, 0.9F, 0.9F + level.random.nextFloat() * 0.2F);
+            level.playSound(null, pos, SoundEvents.CAVE_VINES_PICK_BERRIES, SoundSource.BLOCKS, 0.9F, 0.9F + level.getRandom().nextFloat() * 0.2F);
         }
 
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return level.isClientSide() ? InteractionResult.SUCCESS : InteractionResult.SUCCESS_SERVER;
     }
 
     private Block podItemForAge(int age) {
@@ -223,7 +224,7 @@ public class BaobabFruitPodBlock extends Block implements BonemealableBlock {
     }
 
     private void scheduleRipeFallCheck(ServerLevel level, BlockPos pos) {
-        int delay = RIPE_FALL_MIN_DELAY_TICKS + level.random.nextInt(RIPE_FALL_MAX_DELAY_TICKS - RIPE_FALL_MIN_DELAY_TICKS + 1);
+        int delay = RIPE_FALL_MIN_DELAY_TICKS + level.getRandom().nextInt(RIPE_FALL_MAX_DELAY_TICKS - RIPE_FALL_MIN_DELAY_TICKS + 1);
         level.scheduleTick(pos, this, delay);
     }
 
@@ -244,11 +245,11 @@ public class BaobabFruitPodBlock extends Block implements BonemealableBlock {
 
     private void playPodDetachFeedback(ServerLevel level, BlockPos pos, BlockState fallingPodState) {
         level.levelEvent(2001, pos, Block.getId(fallingPodState));
-        level.playSound(null, pos, fallingPodState.getSoundType().getBreakSound(), SoundSource.BLOCKS, 0.9F, 0.85F + level.random.nextFloat() * 0.1F);
+        level.playSound(null, pos, fallingPodState.getSoundType().getBreakSound(), SoundSource.BLOCKS, 0.9F, 0.85F + level.getRandom().nextFloat() * 0.1F);
     }
 
     private boolean hasPodBelow(LevelReader level, BlockPos pos) {
-        for (BlockPos checkPos = pos.below(); checkPos.getY() >= level.getMinBuildHeight(); checkPos = checkPos.below()) {
+        for (BlockPos checkPos = pos.below(); checkPos.getY() >= level.getMinY(); checkPos = checkPos.below()) {
             BlockState checkState = level.getBlockState(checkPos);
             if (checkState.is(ModBlocks.SMALL_BAOBAB_FRUIT_POD.get())
                     || checkState.is(ModBlocks.MEDIUM_BAOBAB_FRUIT_POD.get())
@@ -264,7 +265,7 @@ public class BaobabFruitPodBlock extends Block implements BonemealableBlock {
     }
 
     private boolean hasValidPodLandingBelow(LevelReader level, BlockPos pos, Direction facing) {
-        for (BlockPos checkPos = pos.below(); checkPos.getY() >= level.getMinBuildHeight(); checkPos = checkPos.below()) {
+        for (BlockPos checkPos = pos.below(); checkPos.getY() >= level.getMinY(); checkPos = checkPos.below()) {
             BlockState checkState = level.getBlockState(checkPos);
             if (checkState.isAir() || checkState.canBeReplaced()) {
                 continue;

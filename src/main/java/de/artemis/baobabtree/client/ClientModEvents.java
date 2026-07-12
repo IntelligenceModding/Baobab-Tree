@@ -1,5 +1,6 @@
 package de.artemis.baobabtree.client;
 
+import de.artemis.baobabtree.client.color.FoliageItemTintSource;
 import de.artemis.baobabtree.client.renderer.BaobabBoatRenderer;
 import de.artemis.baobabtree.client.renderer.BaobabLitterBlockEntityRenderer;
 import de.artemis.baobabtree.common.particle.BaobabLitterFluffParticle;
@@ -8,19 +9,18 @@ import de.artemis.baobabtree.common.registry.ModBlocks;
 import de.artemis.baobabtree.common.registry.ModEntityTypes;
 import de.artemis.baobabtree.common.registry.ModParticles;
 import de.artemis.baobabtree.common.registry.ModWoodTypes;
-import net.minecraft.world.level.FoliageColor;
+import net.minecraft.client.model.BoatModel;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.blockentity.HangingSignRenderer;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
+import net.minecraft.world.level.FoliageColor;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 
 public final class ClientModEvents {
-    private static final int DEFAULT_ACACIA_FOLIAGE_TINT = -5331926;
-
     private ClientModEvents() {
     }
 
@@ -30,9 +30,14 @@ public final class ClientModEvents {
 
     public static void registerEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntityTypes.BAOBAB_BOAT.get(),
-                context -> new BaobabBoatRenderer<>(context, false));
+                context -> new BaobabBoatRenderer(context, false));
         event.registerEntityRenderer(ModEntityTypes.BAOBAB_CHEST_BOAT.get(),
-                context -> new BaobabBoatRenderer<>(context, true));
+                context -> new BaobabBoatRenderer(context, true));
+    }
+
+    public static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
+        event.registerLayerDefinition(BaobabBoatRenderer.BOAT_LAYER, BoatModel::createBoatModel);
+        event.registerLayerDefinition(BaobabBoatRenderer.CHEST_BOAT_LAYER, BoatModel::createChestBoatModel);
     }
 
     public static void registerBlockEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
@@ -49,15 +54,12 @@ public final class ClientModEvents {
         event.register((state, level, pos, tintIndex) ->
                         tintIndex == 0 && level != null && pos != null
                                 ? BiomeColors.getAverageFoliageColor(level, pos)
-                                : tintIndex == 0 ? FoliageColor.getDefaultColor() : -1,
+                                : tintIndex == 0 ? FoliageColor.FOLIAGE_DEFAULT : -1,
                 ModBlocks.BAOBAB_LEAVES.get(),
                 ModBlocks.BAOBAB_LITTER.get());
     }
 
-    public static void registerItemColors(RegisterColorHandlersEvent.Item event) {
-        event.register((stack, tintIndex) -> tintIndex == 0 ? FoliageColor.getDefaultColor() : -1,
-                ModBlocks.BAOBAB_LEAVES.get());
-        event.register((stack, tintIndex) -> tintIndex == 0 ? DEFAULT_ACACIA_FOLIAGE_TINT : -1,
-                ModBlocks.BAOBAB_LITTER.get());
+    public static void registerItemTintSources(RegisterColorHandlersEvent.ItemTintSources event) {
+        event.register(FoliageItemTintSource.ID, FoliageItemTintSource.MAP_CODEC);
     }
 }
