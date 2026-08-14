@@ -21,9 +21,6 @@
 </p>
 
 <p align="center">
-</p>
-
-<p align="center">
   <strong>JEI is optional for ingredient information pages.</strong>
 </p>
 
@@ -63,12 +60,14 @@
 
 <p align="center">
   <a href="https://discord.intelligence-modding.de/"><img src="https://img.shields.io/badge/Discord-Join%20Community-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Join the Intelligence Modding Discord"></a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="https://www.youtube.com/@intelligencemodding4093"><img src="https://img.shields.io/badge/YouTube-Intelligence%20Modding-FF0000?style=for-the-badge&logo=youtube&logoColor=white" alt="Intelligence Modding on YouTube"></a>
 </p>
 
 <p align="center">
   <a href="https://www.curseforge.com/minecraft/mc-mods/baobab-tree"><img src="https://img.shields.io/badge/CurseForge-Baobab%20Tree-F16436?style=for-the-badge&logo=curseforge&logoColor=white" alt="Baobab Tree on CurseForge"></a>
   &nbsp;&nbsp;&nbsp;
-  <a href="https://github.com/IntelligenceModding/Baobab-Tree"><img src="https://img.shields.io/badge/GitHub-Baobab--Tree-181717?style=for-the-badge&logo=github&logoColor=white" alt="Baobab Tree on GitHub"></a>
+  <a href="https://modrinth.com/mod/baobab-tree"><img src="https://img.shields.io/badge/Modrinth-Baobab%20Tree-00AF5C?style=for-the-badge&logo=modrinth&logoColor=white" alt="Baobab Tree on Modrinth"></a>
 </p>
 
 <p align="center">
@@ -112,14 +111,4 @@
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-830F26?style=for-the-badge&labelColor=A4011A&logo=bookstack&logoColor=white" alt="MIT License"></a>
-</p>
-
-<p align="center">
-  <img src="https://raw.githubusercontent.com/IntelligenceModding/Baobab-Tree/refs/heads/assets/Resources.png" alt="Resources" height="75">
-</p>
-
-<p align="center">
-  <a href="https://docs.neoforged.net/"><img src="https://img.shields.io/badge/NeoForge-Documentation-6C47FF?style=for-the-badge&logo=bookstack&logoColor=white" alt="NeoForge Documentation"></a>
-  &nbsp;&nbsp;&nbsp;
-  <a href="https://discord.neoforged.net/"><img src="https://img.shields.io/badge/NeoForged-Discord-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="NeoForged Discord"></a>
 </p>
