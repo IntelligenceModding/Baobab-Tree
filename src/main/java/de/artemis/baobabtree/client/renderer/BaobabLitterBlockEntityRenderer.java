@@ -7,17 +7,18 @@ import de.artemis.baobabtree.common.block.BaobabLitterBlock;
 import de.artemis.baobabtree.common.block.entity.BaobabLitterBlockEntity;
 import de.artemis.baobabtree.common.registry.ModBlocks;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.block.BlockModelRenderState;
-import net.minecraft.client.renderer.block.BlockModelResolver;
-import net.minecraft.client.renderer.block.model.BlockDisplayContext;
+import net.minecraft.client.renderer.block.MovingBlockRenderState;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -31,10 +32,7 @@ public class BaobabLitterBlockEntityRenderer implements BlockEntityRenderer<Baob
             {0.0F, 0.5F, 0.5F, 1.0F}
     };
 
-    private final BlockModelResolver blockModelResolver;
-
     public BaobabLitterBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
-        this.blockModelResolver = context.blockModelResolver();
     }
 
     @Override
@@ -55,8 +53,13 @@ public class BaobabLitterBlockEntityRenderer implements BlockEntityRenderer<Baob
         BlockState litterState = blockEntity.getBlockState();
         Block podBlock = BaobabLitterBlock.podBlockForState(litterState);
         state.visible = podBlock != null;
-        state.podModel.clear();
+        state.podModel = null;
         if (podBlock == null) {
+            return;
+        }
+        Level level = blockEntity.getLevel();
+        if (level == null) {
+            state.visible = false;
             return;
         }
 
@@ -76,12 +79,12 @@ public class BaobabLitterBlockEntityRenderer implements BlockEntityRenderer<Baob
                 BaobabHangingPodBlock.FACING,
                 Direction.Plane.HORIZONTAL.getRandomDirection(random)
         );
-        this.blockModelResolver.update(state.podModel, podState, BlockDisplayContext.create());
+        state.podModel = createMovingBlock(blockEntity.getBlockPos(), podState, level.getBiome(blockEntity.getBlockPos()), level);
     }
 
     @Override
     public void submit(RenderState state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
-        if (!state.visible || state.podModel.isEmpty()) {
+        if (!state.visible || state.podModel == null) {
             return;
         }
 
@@ -92,8 +95,18 @@ public class BaobabLitterBlockEntityRenderer implements BlockEntityRenderer<Baob
         poseStack.mulPose(Axis.XP.rotationDegrees(state.tiltX));
         poseStack.mulPose(Axis.ZP.rotationDegrees(state.tiltZ));
         poseStack.translate(-0.5F, 0.0F, -0.5F);
-        state.podModel.submitMultiLayer(poseStack, submitNodeCollector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
+        submitNodeCollector.submitMovingBlock(poseStack, state.podModel);
         poseStack.popPose();
+    }
+
+    private static MovingBlockRenderState createMovingBlock(BlockPos blockPos, BlockState blockState, Holder<Biome> biome, Level level) {
+        MovingBlockRenderState movingBlockRenderState = new MovingBlockRenderState();
+        movingBlockRenderState.randomSeedPos = blockPos;
+        movingBlockRenderState.blockPos = blockPos;
+        movingBlockRenderState.blockState = blockState;
+        movingBlockRenderState.biome = biome;
+        movingBlockRenderState.level = level;
+        return movingBlockRenderState;
     }
 
     private static float podScale(Block podBlock) {
@@ -163,7 +176,7 @@ public class BaobabLitterBlockEntityRenderer implements BlockEntityRenderer<Baob
     }
 
     public static class RenderState extends BlockEntityRenderState {
-        public final BlockModelRenderState podModel = new BlockModelRenderState();
+        public MovingBlockRenderState podModel;
         public boolean visible;
         public float xOffset;
         public float yOffset;

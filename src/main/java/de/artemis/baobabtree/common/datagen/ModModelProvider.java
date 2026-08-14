@@ -13,7 +13,6 @@ import net.minecraft.client.data.models.model.ModelTemplates;
 import net.minecraft.client.data.models.model.TexturedModel;
 import net.minecraft.client.data.models.model.TextureMapping;
 import net.minecraft.client.data.models.model.TextureSlot;
-import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.client.color.item.ItemTintSource;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -155,8 +154,8 @@ public final class ModModelProvider extends ModelProvider {
 
     private static TextureMapping treeRootMapping() {
         return new TextureMapping()
-                .put(TextureSlot.SIDE, new Material(Identifier.fromNamespaceAndPath(BaobabTree.MOD_ID, "block/tree_roots_side")))
-                .put(TextureSlot.END, new Material(Identifier.fromNamespaceAndPath(BaobabTree.MOD_ID, "block/tree_roots_top")));
+                .put(TextureSlot.SIDE, Identifier.fromNamespaceAndPath(BaobabTree.MOD_ID, "block/tree_roots_side"))
+                .put(TextureSlot.END, Identifier.fromNamespaceAndPath(BaobabTree.MOD_ID, "block/tree_roots_top"));
     }
 
     private static JsonObject fruitPodBlockState() {
