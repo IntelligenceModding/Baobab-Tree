@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://raw.githubusercontent.com/IntelligenceModding/Baobab-Tree/refs/heads/assets/Project%20Title.png" alt="Baobab Tree" width="900">
+  <img src="https://raw.githubusercontent.com/IntelligenceModding/BaobabTree/refs/heads/assets/Project%20Title.png" alt="Baobab Tree" width="900">
 </p>
 
 <p align="center">
@@ -10,8 +10,10 @@
   It focuses on baobab-themed trees, the full wood family, roots, litter, fruit pods, and custom world generation for open warm terrain, while still fitting naturally into vanilla-style survival and building.
 </p>
 
+<br>
+
 <p align="center">
-  <img src="https://raw.githubusercontent.com/IntelligenceModding/Baobab-Tree/refs/heads/assets/Compatibility.png" alt="Compatibility" height="75">
+  <img src="https://raw.githubusercontent.com/IntelligenceModding/BaobabTree/refs/heads/assets/Compatibility.png" alt="Compatibility" height="75">
 </p>
 
 <p align="center">
@@ -28,12 +30,14 @@
   Install JEI alongside Baobab Tree if you want in-game descriptions for the non-obvious mechanics, otherwise the mod works normally without it.
 </p>
 
+<br>
+
 <p align="center">
-  <img src="https://raw.githubusercontent.com/IntelligenceModding/Baobab-Tree/refs/heads/assets/Features.png" alt="Features" height="75">
+  <img src="https://raw.githubusercontent.com/IntelligenceModding/BaobabTree/refs/heads/assets/Features.png" alt="Features" height="75">
 </p>
 
 <p align="center">
-  Baobab Tree currently includes the following content:
+  Baobab Tree currently includes the following features:
 </p>
 
 <p align="center">
@@ -46,8 +50,36 @@
   &bull; Small, medium, and large baobab fruit pods that can be harvested, crafted, placed, or gathered after falling
 </p>
 
+<br>
+
 <p align="center">
-  <img src="https://raw.githubusercontent.com/IntelligenceModding/Baobab-Tree/refs/heads/assets/Community.png" alt="Community" height="75">
+  <img src="https://raw.githubusercontent.com/IntelligenceModding/BaobabTree/refs/heads/assets/Resources.png" alt="Resources" height="75">
+</p>
+
+<p align="center">
+  Bug reports, feature requests, version support requests, and contributions are welcome.
+</p>
+
+<p align="center">
+  Please read the contribution guidelines before submitting changes and use the appropriate issue form when reporting problems or suggesting improvements.
+</p>
+
+<p align="center">
+  <a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/GitHub-Contributing%20Guidelines-181717?style=for-the-badge&logo=github&logoColor=white" alt="Contribution Guidelines"></a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="https://github.com/IntelligenceModding/BaobabTree/issues/new/choose"><img src="https://img.shields.io/badge/GitHub-Issues-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub Issues"></a>
+</p>
+
+<p align="center">
+  <a href="SUPPORT.md"><img src="https://img.shields.io/badge/GitHub-Support-181717?style=for-the-badge&logo=github&logoColor=white" alt="Support"></a>
+  &nbsp;&nbsp;&nbsp;
+  <a href="CODE_OF_CONDUCT.md"><img src="https://img.shields.io/badge/GitHub-Code%20of%20Conduct-181717?style=for-the-badge&logo=github&logoColor=white" alt="Code of Conduct"></a>
+</p>
+
+<br>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/IntelligenceModding/BaobabTree/refs/heads/assets/Community.png" alt="Community" height="75">
 </p>
 
 <p align="center">
@@ -76,8 +108,10 @@
   <a href="https://github.com/IntelligenceModding"><img src="https://img.shields.io/badge/GitHub-IntelligenceModding-181717?style=for-the-badge&logo=github&logoColor=white" alt="Intelligence Modding on GitHub"></a>
 </p>
 
+<br>
+
 <p align="center">
-  <img src="https://raw.githubusercontent.com/IntelligenceModding/Baobab-Tree/refs/heads/assets/Acknowledgments.png" alt="Acknowledgments" height="75">
+  <img src="https://raw.githubusercontent.com/IntelligenceModding/BaobabTree/refs/heads/assets/Acknowledgments.png" alt="Acknowledgments" height="75">
 </p>
 
 <p align="center">
